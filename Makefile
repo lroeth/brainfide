@@ -4,8 +4,14 @@ fltk_link_flags = -lfltk -lXext -lX11 -lm
 run : main
 	./main
 
+rtest : test
+	./test
+
 main : main.o
 	g++ $(fltk_link_flags) -o main $^
+
+test : test.o
+	g++ $(fltk_link_flags) -o test $^
 
 %.o : %.cpp
 	g++ -c $(fltk_comp_flags) -o $@ $<

@@ -10,7 +10,6 @@
 /* config macros */
 #define W_WINDOW 800
 #define H_WINDOW 600
-/* W_BUTTON - W_PART_BUTTON >= 60 */
 #define W_BUTTON 100
 #define H_BUTTON 40
 #define H_DISP 100

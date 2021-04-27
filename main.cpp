@@ -3,20 +3,47 @@
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Box.H>
 
+/* config macros */
+#define W_WINDOW 800
+#define H_WINDOW 600
+/* W_BUTTON - W_PART_BUTTON >= 60 */
+#define W_BUTTON 100
+#define W_PART_BUTTON 30
+#define H_BUTTON 40
+
+
+/* convenience macros */
+#define W_EDITOR W_WINDOW - W_BUTTON
+#define H_EDITOR H_WINDOW
+#define NUM_BUTTONS 2
 
 int main(int argc, char **argv)
 {
-  Fl_Window *window = new Fl_Window(800,600);
-    Fl_Group *groupResize = new Fl_Group(20,20,760,560);
-      Fl_Text_Editor *editor = new Fl_Text_Editor(20,20,760,560);
+  /* widget hierarchy */
+  Fl_Window *window = new Fl_Window(W_WINDOW,H_WINDOW);
+    Fl_Group *groupResize = new Fl_Group(0,0,W_EDITOR,H_EDITOR);
+      Fl_Text_Editor *editor = new Fl_Text_Editor(0,0,W_EDITOR,H_EDITOR);
     groupResize->end();
+    Fl_Group *groupButtons = new Fl_Group(W_EDITOR,0,W_BUTTON,H_EDITOR);
+      Fl_Button *buttonRun = new Fl_Button(W_EDITOR,0,W_BUTTON,H_BUTTON,"Run");
+      Fl_Button *buttonBack = new Fl_Button(W_EDITOR,1 * H_BUTTON,W_PART_BUTTON,H_BUTTON,"@<");
+      Fl_Button *buttonForward = new Fl_Button(W_EDITOR + W_PART_BUTTON, 1 * H_BUTTON, W_BUTTON - W_PART_BUTTON,H_BUTTON,"Step @>");
+      Fl_Box *spaceButtons = new Fl_Box(W_EDITOR, NUM_BUTTONS * H_BUTTON,W_BUTTON,H_EDITOR - NUM_BUTTONS * H_BUTTON);
+    groupButtons->end();
   window->end();
 
+  /* adjust widgets */
+  window->resizable(groupResize);
+  groupButtons->resizable(spaceButtons);
+
+  /* setup editor */
   Fl_Text_Buffer *buffer = new Fl_Text_Buffer();
   editor->buffer(buffer);
-  window->resizable(groupResize);
 
+  /* start */
   window->show(argc, argv);
   return Fl::run();
 }

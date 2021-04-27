@@ -1,5 +1,6 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Pack.H>
+#include <FL/Fl_Scroll.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
@@ -13,12 +14,12 @@
 #define W_BUTTON 100
 #define H_BUTTON 40
 #define H_DISP 100
+#define H_TAPE (H_BUTTON + Fl::scrollbar_size())
 #define MIN_W_EDITOR 100
 
 /* convenience macros */
 #define W_EDITOR W_WINDOW - W_BUTTON
-#define H_EDITOR H_WINDOW - H_DISP
-#define W_DISP W_WINDOW
+#define H_EDITOR H_WINDOW - H_DISP - H_TAPE
 
 int main(int argc, char **argv)
 {
@@ -35,19 +36,26 @@ int main(int argc, char **argv)
           packStep->end();
         packButtons->end();
       packEditor->end();
-      Fl_Text_Display *dispIo = new Fl_Text_Display(0,H_EDITOR,W_DISP,H_DISP);
+      Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
+      Fl_Scroll *scrollTape = new Fl_Scroll(0,0,0,H_TAPE);
+        Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1000,H_BUTTON);
+          Fl_Box *garbage = new Fl_Box(0,0,1000,0,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Scrolling Garbage");
+        packTape->end();
+      scrollTape->end();
     packWindow->end();
   window->end();
 
   /* configure widgets and resize behaviour */
-  packWindow->type(Fl_Pack::VERTICAL);
-  packEditor->type(Fl_Pack::HORIZONTAL);
-  packButtons->type(Fl_Pack::VERTICAL);
   packStep->type(Fl_Pack::HORIZONTAL);
+  packButtons->type(Fl_Pack::VERTICAL);
+  packEditor->type(Fl_Pack::HORIZONTAL);
+  packTape->type(Fl_Pack::HORIZONTAL);
+  packWindow->type(Fl_Pack::VERTICAL);
+  scrollTape->resizable(0);
   packEditor->resizable(editor);
   packWindow->resizable(packEditor);
   window->resizable(packWindow);
-  window->size_range(MIN_W_EDITOR+W_BUTTON,packButtons->children()*H_BUTTON + H_DISP);
+  window->size_range(MIN_W_EDITOR+W_BUTTON,packButtons->children()*H_BUTTON + H_DISP + H_TAPE);
 
   /* setup data structures and callbacks */
   Fl_Text_Buffer *bufferProg = new Fl_Text_Buffer();

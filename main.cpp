@@ -1,7 +1,7 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Scroll.H>
-#include <FL/Fl_Window.H>
+#include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
@@ -31,7 +31,7 @@
 int main(int argc, char **argv)
 {
   /* widget hierarchy */
-  Fl_Window *window = new Fl_Window(W_WINDOW,H_WINDOW,"bfide");
+  Fl_Double_Window *window = new Fl_Double_Window(W_WINDOW,H_WINDOW,"bfide");
     Fl_Pack *packWindow = new Fl_Pack(0,0,W_WINDOW,H_WINDOW);
       Fl_Pack *packEditor = new Fl_Pack(0,0,W_WINDOW,H_EDITOR);
         Fl_Text_Editor *editor = new Fl_Text_Editor(0,0,W_EDITOR,0);

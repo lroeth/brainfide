@@ -8,6 +8,8 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
+#include "bfide.h"
+
 
 /* config macros */
 #define W_WINDOW 800
@@ -44,26 +46,6 @@ int main(int argc, char **argv)
       Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
       Fl_Scroll *scrollTape = new Fl_Scroll(0,0,0,H_TAPE);
         Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
-          Fl_Group *cell0 = new Fl_Group(0,0,W_CELL,H_CELL);
-            Fl_Output *cell0char = new Fl_Output(0,0,W_CELL,H_CELL_FIELD);
-            Fl_Output *cell0val = new Fl_Output(0,H_CELL_FIELD,W_CELL,H_CELL_FIELD);
-            Fl_Box *cell0num = new Fl_Box(0,2*H_CELL_FIELD,W_CELL,H_CELL_FIELD,"0");
-          cell0->end();
-          Fl_Group *cell1 = new Fl_Group(0,0,W_CELL,H_CELL);
-            Fl_Output *cell1char = new Fl_Output(0,0,W_CELL,H_CELL_FIELD);
-            Fl_Output *cell1val = new Fl_Output(0,H_CELL_FIELD,W_CELL,H_CELL_FIELD);
-            Fl_Box *cell1num = new Fl_Box(0,2*H_CELL_FIELD,W_CELL,H_CELL_FIELD,"1");
-          cell1->end();
-          Fl_Group *cell2 = new Fl_Group(0,0,W_CELL,H_CELL);
-            Fl_Output *cell2char = new Fl_Output(0,0,W_CELL,H_CELL_FIELD);
-            Fl_Output *cell2val = new Fl_Output(0,H_CELL_FIELD,W_CELL,H_CELL_FIELD);
-            Fl_Box *cell2num = new Fl_Box(0,2*H_CELL_FIELD,W_CELL,H_CELL_FIELD,"2");
-          cell2->end();
-          Fl_Group *cell3 = new Fl_Group(0,0,W_CELL,H_CELL);
-            Fl_Output *cell3char = new Fl_Output(0,0,W_CELL,H_CELL_FIELD);
-            Fl_Output *cell3val = new Fl_Output(0,H_CELL_FIELD,W_CELL,H_CELL_FIELD);
-            Fl_Box *cell3num = new Fl_Box(0,2*H_CELL_FIELD,W_CELL,H_CELL_FIELD,"3");
-          cell3->end();
         packTape->end();
       scrollTape->end();
     packWindow->end();
@@ -82,14 +64,8 @@ int main(int argc, char **argv)
   window->size_range(MIN_W_EDITOR+W_BUTTON,packButtons->children()*H_BUTTON + H_DISP + H_TAPE);
 
   /* setup data structures and callbacks */
-  cell0char->value("W");
-  cell1char->value("X");
-  cell2char->value("Y");
-  cell3char->value("Z");
-  cell0val->value("57");
-  cell1val->value("58");
-  cell2val->value("59");
-  cell3val->value("5A");
+  State state(H_CELL_FIELD,W_CELL,packTape,scrollTape);
+  buttonRun->callback(&addCellCb, &state);
   Fl_Text_Buffer *bufferProg = new Fl_Text_Buffer();
   editor->buffer(bufferProg);
   Fl_Text_Buffer *bufferIo = new Fl_Text_Buffer();

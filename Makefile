@@ -7,14 +7,13 @@ run : main
 rtest : test
 	./test
 
-main : main.o
+main : main.o bfide.o
 	g++ $(fltk_link_flags) -o main $^
 
 test : test.o
 	g++ $(fltk_link_flags) -o test $^
 
-%.o : %.cpp
+%.o : %.cpp *.h
 	g++ -c $(fltk_comp_flags) -o $@ $<
-
 
 .SECONDARY : *.o

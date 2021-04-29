@@ -8,12 +8,15 @@ rtest : test
 	./test
 
 main : main.o bfide.o
-	g++ $(fltk_link_flags) -o main $^
+	g++ $(fltk_link_flags) -o $@ $^
 
 test : test.o
-	g++ $(fltk_link_flags) -o test $^
+	g++ $(fltk_link_flags) -o $@ $^
 
 %.o : %.cpp *.h
 	g++ -c $(fltk_comp_flags) -o $@ $<
+
+clint : clint.o bfint.o
+	g++ $(fltk_link_flags) -o $@ $^
 
 .SECONDARY : *.o

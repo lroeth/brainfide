@@ -7,7 +7,7 @@ run : main
 rtest : test
 	./test
 
-main : main.o bfide.o
+main : main.o bfide.o bfint.o
 	g++ $(fltk_link_flags) -o $@ $^
 
 test : test.o

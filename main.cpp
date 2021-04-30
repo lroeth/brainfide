@@ -64,13 +64,12 @@ int main(int argc, char **argv)
   window->size_range(MIN_W_EDITOR+W_BUTTON,packButtons->children()*H_BUTTON + H_DISP + H_TAPE);
 
   /* setup data structures and callbacks */
-  State state(H_CELL_FIELD,W_CELL,packTape,scrollTape);
-  buttonRun->callback(&addCellCb, &state);
-  Fl_Text_Buffer *bufferProg = new Fl_Text_Buffer();
-  editor->buffer(bufferProg);
-  Fl_Text_Buffer *bufferIo = new Fl_Text_Buffer();
-  dispIo->buffer(bufferIo);
-  bufferIo->append(">");
+  Fl_Text_Buffer *buffProg = new Fl_Text_Buffer();
+  editor->buffer(buffProg);
+  Fl_Text_Buffer *buffIo = new Fl_Text_Buffer();
+  dispIo->buffer(buffIo);
+  IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,scrollTape,packTape);
+  buttonRun->callback(&run_cb, &state);
 
   /* run */
   window->show(argc, argv);

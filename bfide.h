@@ -1,5 +1,9 @@
-#include <FL/Fl_Pack.H>
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Pack.H>
+#include "bfint.h"
 
 struct CellConfig
 {
@@ -8,16 +12,25 @@ struct CellConfig
   CellConfig(int h_cell_field, int w_cell);
 };
 
-struct State
+class IdeState : public BFInt
 {
-  unsigned char nextval;
-  int numCells;
-  const struct CellConfig config;
-  Fl_Pack *tape;
-  Fl_Scroll *scroll;
+  public:
+    IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
+//  private:
+    unsigned char input();
+    void output(unsigned char out);
+    void err_output(std::string message, bool is_warning);
 
-  State(int h_cell_field, int w_cell,Fl_Pack *tape, Fl_Scroll *scroll);
-  void addCell();
+//    signed char d_handle();
+    void d_add_cell();
+//    void d_write_cell();
+//    void d_clear_tape();
+
+    const struct CellConfig config;
+    Fl_Text_Editor *editor;
+    Fl_Text_Display *dispIo;
+    Fl_Scroll *scrollTape;
+    Fl_Pack *packTape;
 };
+void run_cb(Fl_Widget *w, void *p);
 
-void addCellCb(Fl_Widget *w, void *p);

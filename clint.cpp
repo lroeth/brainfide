@@ -1,6 +1,28 @@
-#include <iostream>
+#include "clint.h"
+#include <string.h>
 #include <fstream>
-#include "bfint.h"
+
+unsigned char CLInt::input()
+{
+  char in = std::cin.get();
+  if(!std::cin.good())
+  {
+    err_output("EOF on input",true);
+    in='\0';
+  }
+  return in;
+}
+
+void CLInt::output(unsigned char out)
+  {std::cout<<out;}
+
+void CLInt::err_output(std::string message, bool is_warning)
+  {std::cerr<<(is_warning?"WARNING: ":"ERROR: ")<<message<<std::endl;}
+
+signed char CLInt::d_handle()
+  {return 0;/* ignore non command characters */}
+
+
 
 int main(int argc, char **argv)
 {
@@ -15,7 +37,7 @@ int main(int argc, char **argv)
     program+=curr;
     program+='\n';
   }
-  State state;
+  CLInt state;
   if(!state.update_program(program))
     return 2;
   int status;

@@ -2,13 +2,13 @@
 #include <stack>
 #include "bfint.h"
 
-State::State() :
-  program("")
-{
-  reset_exec();
-}
+BFInt::BFInt() :
+  progPos(0),
+  tapePos(0),
+  tape(1,0)
+{}
 
-bool State::update_program(std::string program)
+bool BFInt::update_program(std::string program)
 {
   std::stack<unsigned> parse;
   for(int i=0;i<program.size();i++)
@@ -16,75 +16,112 @@ bool State::update_program(std::string program)
     switch(program[i])
     {
       case '[': parse.push(i); break;
-      case ']': if(parse.empty()) goto unmatched;
+      case ']': if(parse.empty())
+                {
+                  err_output("Unmatched ]",false);
+                  return false;
+                }
                 loops[i]=parse.top();
                 loops[parse.top()]=i;
                 parse.pop();
     }
   }
-  if(!parse.empty()) goto unmatched;
+  if(!parse.empty())
+  {
+    err_output("Unmatched [",false);
+    return false;
+  }
   this->program = program;
   return true;
-  unmatched: err_output("Unmatched [ or ]",false); return false;
 }
 
-int State::step()
+void BFInt::reset_exec()
+{
+  tape.assign(1,0);
+  progPos = tapePos = 0;
+  d_clear_tape();
+}
+
+signed char BFInt::step()
 {
   if(progPos >= program.size())
     return 1;
-  bool handled = handle(program[progPos]);
-  progPos++;
-  return handled ? 0 : -1;
-}
-
-void State::reset_exec()
-{
-  tape.resize(1);
-  tape[0] = progPos = tapePos = 0;
-}
-
-bool State::handle(char command)
-{
-  switch(command)
+  signed char status = 0;
+  switch(program[progPos])
   {
     case '<': if(!tapePos)
               {
                 err_output("Can't go left at cell 0",false);
-                return false;
-              } 
-              tapePos--; break;
-    case '>': if(++tapePos==tape.size())
-                tape.push_back(0);
+                return -1;
+              }
+              write_tape_pos(tapePos - 1);
               break;
-    case '+': tape[tapePos]++; break;
-    case '-': tape[tapePos]--; break;
-    case ',': tape[tapePos] = input(); break;
+    case '>': write_tape_pos(tapePos + 1);
+              break;
+    case '+': write_cell(tape[tapePos]+1); break;
+    case '-': write_cell(tape[tapePos]-1); break;
+    case ',': write_cell(input()); break;
     case '.': output(tape[tapePos]); break;
-    case ']': progPos = loops[progPos]; /* no break */
+    case ']': write_prog_pos(loops[progPos]); return 0;
     case '[': if(!tape[tapePos])
-                progPos = loops[progPos];
+              {
+                write_prog_pos(loops[progPos]+1);
+                return 0;
+              }
               break;
-    case ' ':
-    case '\t':
-    case '\n': break;
-    default : err_output(std::string("Unrecognized command '") + command + '\'',true);
+    default : status = d_handle();
+              if(status<0)
+              {
+                status=0;
+                err_output(std::string("Unrecognized command '")+program[progPos]+'\'',true);
+              }
   }
-  return true;
+  write_prog_pos(progPos+1);
+  return status>0 ? 1 : 0;
 }
 
-unsigned char State::input()
+unsigned BFInt::get_prog_pos()
+  {return progPos;}
+
+unsigned BFInt::get_tape_pos()
+  {return tapePos;}
+
+int BFInt::get_cmd(unsigned pos)
 {
-  char in = std::cin.get();
-  if(!std::cin.good())
-  {
-    err_output("EOF on input",true);
-    in='\0';
-  }
-  return in;
+  if(pos>=program.size())
+    return -1;
+  return program[pos];
 }
 
-void State::output(unsigned char out)
-  {std::cout<<out;}
+unsigned char BFInt::get_cell(unsigned pos)
+{
+  if(pos>=tape.size())
+    return 0;
+  return tape[pos];
+}
 
-void State::err_output(std::string message, bool is_recoverable)
-  {std::cerr<<(is_recoverable ? "ERROR: ":"WARNING: ")<<message<<std::endl;}
+void BFInt::write_cell(unsigned char val)
+{
+  tape[tapePos] = val;
+  d_write_cell(val);
+}
+
+void BFInt::write_tape_pos(unsigned newPos)
+{
+  tapePos=newPos;
+  while(newPos>=tape.size())
+    add_cell();
+  d_write_tape_pos(newPos);
+}
+
+void BFInt::write_prog_pos(unsigned newPos)
+{
+  progPos=newPos;
+  d_write_prog_pos(newPos);
+}
+
+void BFInt::add_cell()
+{
+  tape.push_back(0);
+  d_add_cell();
+}

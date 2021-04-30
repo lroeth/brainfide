@@ -60,10 +60,9 @@ void run_cb(Fl_Widget *w, void *p)
   IdeState *state = (IdeState*) p;
   char *buff = state->editor->buffer()->text();
   state->update_program(buff);
-  char *curr = buff;
-  for(;*curr!='\0';curr++)
-    state->output(*curr);
   free(buff);
+  while(!state->step());
+  state->reset_exec();
 }
 
 

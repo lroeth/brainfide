@@ -24,8 +24,6 @@ class BFInt
     virtual void err_output(std::string message, bool is_error)=0;
 
   private:
-    void add_cell();
-
     virtual signed char d_handle() {return -1;} /* return negative to indicate unhandled character, positive to stop, 0 to continue */
     virtual void d_add_cell() {}
     virtual void d_write_cell(unsigned char val) {}

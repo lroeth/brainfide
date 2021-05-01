@@ -38,6 +38,11 @@ void IdeState::err_output(std::string message, bool is_warning)
 {
 }
 
+signed char IdeState::d_handle()
+{
+  return 0;
+}
+
 void IdeState::d_add_cell()
 {
   const int h_cell_field = config.h_cell_field;
@@ -49,10 +54,31 @@ void IdeState::d_add_cell()
     Fl_Box *newCellIndex = new Fl_Box(0,2*h_cell_field,w_cell,h_cell_field);
   newCell->end();
   packTape->add(newCell);
-  char buff[1024] = "";
-  snprintf(buff,1024,"%i",get_tape_pos());
+  char buff[20] = "";
+  snprintf(buff,20,"%i",get_tape_pos());
   newCellIndex->copy_label(buff);
+  d_write_cell(0);
   scrollTape->redraw();
+}
+
+void IdeState::d_write_cell(unsigned char val)
+{
+  Fl_Group *cell=packTape->child(get_tape_pos())->as_group();
+  Fl_Output *cellMemb = (Fl_Output*) cell->child(0);
+  char buff[3] = "";
+  snprintf(buff,3,"%c",val);
+  cellMemb->value(buff);
+  cellMemb = (Fl_Output*) cell->child(1);
+  snprintf(buff,3,"%2X",val);
+  cellMemb->value(buff);
+  scrollTape->redraw();
+}
+
+void IdeState::d_clear_tape()
+{
+  dispIo->buffer()->text(0);
+  packTape->clear();
+  d_add_cell();
 }
 
 void run_cb(Fl_Widget *w, void *p)
@@ -61,16 +87,6 @@ void run_cb(Fl_Widget *w, void *p)
   char *buff = state->editor->buffer()->text();
   state->update_program(buff);
   free(buff);
-  while(!state->step());
   state->reset_exec();
+  while(!state->step());
 }
-
-
-
-
-
-//  snprintf(buff,1024,"%c",);
-//  newCellChar->value(buff);
-//  snprintf(buff,1024,"%2X",);
-//  newCellVal->value(buff);
-//  scroll->redraw();

@@ -18,7 +18,7 @@
 #define H_BUTTON 40
 #define H_DISP 100
 #define H_CELL_FIELD 20
-#define W_CELL 80
+#define W_CELL 40
 #define MIN_W_EDITOR 100
 
 /* convenience macros */
@@ -69,6 +69,7 @@ int main(int argc, char **argv)
   Fl_Text_Buffer *buffIo = new Fl_Text_Buffer();
   dispIo->buffer(buffIo);
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,scrollTape,packTape);
+  state.reset_exec();
   buttonRun->callback(&run_cb, &state);
 
   /* run */

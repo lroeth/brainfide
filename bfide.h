@@ -21,10 +21,10 @@ class IdeState : public BFInt
     void output(unsigned char out);
     void err_output(std::string message, bool is_warning);
 
-//    signed char d_handle();
+    signed char d_handle();
     void d_add_cell();
-//    void d_write_cell();
-//    void d_clear_tape();
+    void d_write_cell(unsigned char val);
+    void d_clear_tape();
 
     const struct CellConfig config;
     Fl_Text_Editor *editor;
@@ -33,4 +33,3 @@ class IdeState : public BFInt
     Fl_Pack *packTape;
 };
 void run_cb(Fl_Widget *w, void *p);
-

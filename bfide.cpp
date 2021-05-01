@@ -13,10 +13,30 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
   dispIo(dispIo),
   scrollTape(scrollTape),
   packTape(packTape)
-{}
+{
+  reset_exec();
+}
 
 
 
+
+void IdeState::highlight_cell(unsigned cell)
+{
+  if(cell >= packTape->children())
+    return;
+  Fl_Group *cellGroup = packTape->child(cell)->as_group();
+  Fl_Widget *cellMemb = cellGroup->child(2);
+  cellMemb->box(FL_UP_BOX);
+}
+
+void IdeState::unhighlight_cell(unsigned cell)
+{
+  if(cell >= packTape->children())
+    return;
+  Fl_Group *cellGroup = packTape->child(cell)->as_group();
+  Fl_Widget *cellMemb = cellGroup->child(2);
+  cellMemb->box(FL_NO_BOX);
+}
 
 unsigned char IdeState::input()
 {
@@ -58,7 +78,6 @@ void IdeState::d_add_cell()
   snprintf(buff,20,"%i",get_tape_pos());
   newCellIndex->copy_label(buff);
   d_write_cell(0);
-  scrollTape->redraw();
 }
 
 void IdeState::d_write_cell(unsigned char val)
@@ -74,11 +93,19 @@ void IdeState::d_write_cell(unsigned char val)
   scrollTape->redraw();
 }
 
+void IdeState::d_write_tape_pos(unsigned oldPos)
+{
+  unhighlight_cell(oldPos);
+  highlight_cell(get_tape_pos());
+  scrollTape->redraw();
+}
+
 void IdeState::d_clear_tape()
 {
-  dispIo->buffer()->text(0);
+//  dispIo->buffer()->text(0);
   packTape->clear();
   d_add_cell();
+  highlight_cell(0);
 }
 
 void run_cb(Fl_Widget *w, void *p)

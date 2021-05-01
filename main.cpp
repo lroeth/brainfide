@@ -69,7 +69,6 @@ int main(int argc, char **argv)
   Fl_Text_Buffer *buffIo = new Fl_Text_Buffer();
   dispIo->buffer(buffIo);
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,scrollTape,packTape);
-  state.reset_exec();
   buttonRun->callback(&run_cb, &state);
 
   /* run */

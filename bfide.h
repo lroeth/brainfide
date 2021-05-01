@@ -17,6 +17,8 @@ class IdeState : public BFInt
   public:
     IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
 //  private:
+    void highlight_cell(unsigned cell);
+    void unhighlight_cell(unsigned cell);
     unsigned char input();
     void output(unsigned char out);
     void err_output(std::string message, bool is_warning);
@@ -24,6 +26,7 @@ class IdeState : public BFInt
     signed char d_handle();
     void d_add_cell();
     void d_write_cell(unsigned char val);
+    void d_write_tape_pos(unsigned oldPos);
     void d_clear_tape();
 
     const struct CellConfig config;

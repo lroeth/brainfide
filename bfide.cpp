@@ -67,6 +67,8 @@ void IdeState::output(unsigned char out)
 
 void IdeState::err_output(std::string message, bool is_warning)
 {
+  if(!is_warning)
+    dispIo->buffer()->append(("\nERROR: "+message).c_str());
 }
 
 signed char IdeState::d_handle()

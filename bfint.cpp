@@ -78,7 +78,7 @@ signed char BFInt::step()
               }
   }
   write_prog_pos(progPos+1);
-  return status>0 ? 1 : 0;
+  return status;
 }
 
 unsigned BFInt::get_prog_pos()

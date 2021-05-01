@@ -108,17 +108,19 @@ void BFInt::write_cell(unsigned char val)
 
 void BFInt::write_tape_pos(unsigned newPos)
 {
-  d_write_tape_pos(newPos);
-  tapePos=newPos;
+  unsigned oldPos = tapePos;
   while(newPos>=tape.size())
   {
+    tapePos = tape.size();
     tape.push_back(0);
     d_add_cell();
   }
+  d_write_tape_pos(oldPos);
 }
 
 void BFInt::write_prog_pos(unsigned newPos)
 {
-  d_write_prog_pos(newPos);
+  unsigned oldPos = progPos;
   progPos=newPos;
+  d_write_prog_pos(oldPos);
 }

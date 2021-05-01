@@ -27,8 +27,8 @@ class BFInt
     virtual signed char d_handle() {return -1;} /* return negative to indicate unhandled character, positive to stop, 0 to continue */
     virtual void d_add_cell() {}
     virtual void d_write_cell(unsigned char val) {}
-    virtual void d_write_tape_pos(unsigned newPos) {}
-    virtual void d_write_prog_pos(unsigned newPos) {}
+    virtual void d_write_tape_pos(unsigned oldPos) {}
+    virtual void d_write_prog_pos(unsigned oldPos) {}
     virtual void d_clear_tape() {}
 
     unsigned progPos;

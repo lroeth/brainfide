@@ -71,7 +71,7 @@ void IdeState::err_output(std::string message, bool is_warning)
 
 signed char IdeState::d_handle()
 {
-  return 0;
+  return get_cmd(get_prog_pos()) == '$' ? 2 : 0;
 }
 
 void IdeState::d_add_cell()
@@ -140,7 +140,7 @@ void step_fwd_cb(Fl_Widget *w, void *p)
   else
   {
     state->lastStep = state->step();
-    if(state->lastStep)
+    if(state->lastStep == 1 || state->lastStep < 0)
     {
       state->reset_exec();
       state->lastStep = 0;

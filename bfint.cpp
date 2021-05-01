@@ -38,7 +38,8 @@ bool BFInt::update_program(std::string program)
 void BFInt::reset_exec()
 {
   tape.assign(1,0);
-  progPos = tapePos = 0;
+  write_tape_pos(0);
+  write_prog_pos(0);
   d_clear_tape();
 }
 

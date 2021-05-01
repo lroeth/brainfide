@@ -12,7 +12,9 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
   editor(editor),
   dispIo(dispIo),
   scrollTape(scrollTape),
-  packTape(packTape)
+  packTape(packTape),
+  dirty(false),
+  lastStep(1)
 {
   reset_exec();
 }
@@ -36,6 +38,15 @@ void IdeState::unhighlight_cell(unsigned cell)
   Fl_Group *cellGroup = packTape->child(cell)->as_group();
   Fl_Widget *cellMemb = cellGroup->child(2);
   cellMemb->box(FL_NO_BOX);
+}
+
+void IdeState::edit_program()
+{
+  char *buff = editor->buffer()->text();
+  update_program(buff);
+  free(buff);
+  reset_exec();
+  dirty = false;
 }
 
 unsigned char IdeState::input()
@@ -100,9 +111,12 @@ void IdeState::d_write_tape_pos(unsigned oldPos)
   scrollTape->redraw();
 }
 
+void IdeState::d_write_prog_pos(unsigned oldPos)
+  {editor->buffer()->highlight(get_prog_pos(),get_prog_pos()+1);}
+
 void IdeState::d_clear_tape()
 {
-//  dispIo->buffer()->text(0);
+  dispIo->buffer()->text(0);
   packTape->clear();
   d_add_cell();
   highlight_cell(0);
@@ -111,9 +125,33 @@ void IdeState::d_clear_tape()
 void run_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
-  char *buff = state->editor->buffer()->text();
-  state->update_program(buff);
-  free(buff);
-  state->reset_exec();
-  while(!state->step());
+  if(state->dirty || state->lastStep<0)
+    state->edit_program();
+  else if(state->lastStep == 1)
+    state->reset_exec();
+  while(!(state->lastStep = state->step()));
+}
+
+void step_fwd_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  if(state->dirty)
+    state->edit_program();
+  else
+  {
+    state->lastStep = state->step();
+    if(state->lastStep)
+    {
+      state->reset_exec();
+      state->lastStep = 0;
+    }
+  }
+}
+
+void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
+               const char* deletedText,
+               void* p)
+{
+  IdeState *state = (IdeState*) p;
+  state->dirty |= (nInserted || nDeleted);
 }

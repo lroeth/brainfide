@@ -19,6 +19,8 @@ class IdeState : public BFInt
 //  private:
     void highlight_cell(unsigned cell);
     void unhighlight_cell(unsigned cell);
+    void edit_program();
+
     unsigned char input();
     void output(unsigned char out);
     void err_output(std::string message, bool is_warning);
@@ -27,6 +29,7 @@ class IdeState : public BFInt
     void d_add_cell();
     void d_write_cell(unsigned char val);
     void d_write_tape_pos(unsigned oldPos);
+    void d_write_prog_pos(unsigned oldPos);
     void d_clear_tape();
 
     const struct CellConfig config;
@@ -34,5 +37,11 @@ class IdeState : public BFInt
     Fl_Text_Display *dispIo;
     Fl_Scroll *scrollTape;
     Fl_Pack *packTape;
+    bool dirty;
+    signed char lastStep;
 };
 void run_cb(Fl_Widget *w, void *p);
+void step_fwd_cb(Fl_Widget *w, void *p);
+void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
+               const char* deletedText,
+               void* p);

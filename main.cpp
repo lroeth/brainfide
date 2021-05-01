@@ -70,6 +70,8 @@ int main(int argc, char **argv)
   dispIo->buffer(buffIo);
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,scrollTape,packTape);
   buttonRun->callback(&run_cb, &state);
+  buttonForward->callback(&step_fwd_cb, &state);
+  buffProg->add_modify_callback(edited_cb, &state);
 
   /* run */
   window->show(argc, argv);

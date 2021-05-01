@@ -116,6 +116,7 @@ void BFInt::write_tape_pos(unsigned newPos)
     tape.push_back(0);
     d_add_cell();
   }
+  tapePos = newPos;
   d_write_tape_pos(oldPos);
 }
 

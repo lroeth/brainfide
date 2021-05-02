@@ -28,7 +28,9 @@ main.o : main.cpp bfide.h
 	g++ -c $(fltk_comp_flags) -o $@ $<
 test.o : test.cpp bfide.h
 	g++ -c $(fltk_comp_flags) -o $@ $<
-bfide.h : bfint.h
+roeditor.o : roeditor.cpp roeditor.h
+	g++ -c $(fltk_comp_flags) -o $@ $<
+bfide.h : bfint.h roeditor.h
 	touch bfide.h
 clint.h : bfint.h
 	touch clint.h

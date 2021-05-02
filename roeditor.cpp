@@ -1,7 +1,7 @@
 #include <FL/Fl.H>
 #include "roeditor.h"
 
-void RO_Editor::set_getchar(char (*getchar_fp)(RO_Editor *,void *), void *p)
+void RO_Editor::set_getchar(char (*getchar_fp)(void *), void *p)
 {
   this->getchar_fp = getchar_fp;
   this->p = p;
@@ -17,7 +17,7 @@ char RO_Editor::getchar()
 {
   char out;
   isBlocked=true;
-  out = getchar_fp(this, p);
+  out = getchar_fp(p);
   isBlocked=false;
   if(buffer())
   {
@@ -55,8 +55,9 @@ int RO_Editor::default_handle(RO_Editor *t, int e)
   {return t->Fl_Text_Display::handle(e);}
 
 
-char RO_Editor::q_getchar(RO_Editor *t, void *p)
+char RO_Editor::q_getchar(void *p)
 {
+  RO_Editor *t = (RO_Editor*)p;
   while(t->inpQ.empty())
     Fl::wait();
   char out = t->inpQ.front();

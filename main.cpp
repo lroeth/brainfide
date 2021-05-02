@@ -9,6 +9,7 @@
 #include <FL/Fl_Repeat_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Input.H>
 #include "bfide.h"
 
 
@@ -42,10 +43,11 @@ int main(int argc, char **argv)
             Fl_Repeat_Button *buttonBack = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@<");
             Fl_Repeat_Button *buttonForward = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@>");
           packStep->end();
+        Fl_Input *inpIo = new Fl_Input(0,0,0,H_BUTTON);
         packButtons->end();
       packEditor->end();
       RO_Editor *dispIo = new RO_Editor(0,0,0,H_DISP);
-      Fl_Scroll *scrollTape = new Fl_Scroll(0,0,0,H_TAPE);
+      Fl_Scroll *scrollTape = new Fl_Scroll(0,0,W_WINDOW,H_TAPE);
         Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
         packTape->end();
       scrollTape->end();

@@ -72,7 +72,7 @@ int main(int argc, char **argv)
   editor->textfont(FL_COURIER);
   Fl_Text_Buffer *buffIo = new Fl_Text_Buffer();
   dispIo->buffer(buffIo);
-  dispIo->textfont(FL_COURIER);
+  dispIo->textfont(FL_SCREEN);
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,scrollTape,packTape);
   buttonRun->callback(&run_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);

@@ -7,10 +7,10 @@ run : main
 rtest : test
 	./test
 
-main : main.o bfide.o bfint.o
+main : main.o bfide.o bfint.o roeditor.o
 	g++ $(fltk_link_flags) -o $@ $^
 
-test : test.o bfide.o bfint.o
+test : test.o bfide.o bfint.o roeditor.o
 	g++ $(fltk_link_flags) -o $@ $^
 
 clint : clint.o bfint.o

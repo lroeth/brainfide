@@ -11,11 +11,19 @@ struct RO_Editor : public Fl_Text_Display
   RO_Editor(int X, int Y, int W, int H, const char* label=0) :
     Fl_Text_Display(X,Y,W,H,label),
     inpQ(),
-    isBlocked(false)
+    isBlocked(false),
+    block(&RO_Editor::default_block),
+    handle_fp(&RO_Editor::kb_handle)
     {}
+  static int kb_handle(RO_Editor *t,int e);
+  static int default_handle(RO_Editor *t,int e);
+  int (*handle_fp)(RO_Editor *t,int e);
   int handle(int e);
   char getchar();
   bool isBlocked;
+  void *p;
+  void (*block)(void *p);
+  static void default_block(void *p) {Fl::wait();}
   std::queue<char> inpQ;
 };
 

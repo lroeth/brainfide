@@ -6,24 +6,30 @@
 #include "bfide.h"
 
 int RO_Editor::handle(int e)
+  {return handle_fp(this,e);}
+
+int RO_Editor::kb_handle(RO_Editor *t,int e)
 {
-  if(isBlocked && e==FL_KEYBOARD)
+  if(t->isBlocked && e==FL_KEYBOARD)
   {
     int key = Fl::event_key();
     {
       for(int i=0;i<Fl::event_length();i++)
-        inpQ.push(Fl::event_text()[i]);
+        t->inpQ.push(Fl::event_text()[i]);
       return 1;
     }
   }
-  return Fl_Text_Display::handle(e);
+  return RO_Editor::default_handle(t,e);
 }
+
+int RO_Editor::default_handle(RO_Editor *t, int e)
+  {return t->Fl_Text_Display::handle(e);}
 
 char RO_Editor::getchar()
 {
   isBlocked=true;
   while(inpQ.empty())
-    Fl::wait();
+    block(p);
   isBlocked=false;
   char out = inpQ.front();
   inpQ.pop();

@@ -1,19 +1,53 @@
 #include <stdio.h>
+#include <FL/Fl.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Box.H>
 #include "bfide.h"
 
+
+int RO_Editor::handle(int e)
+{
+  if(e==FL_KEYBOARD || e==FL_PASTE)
+  {
+    int key = Fl::event_key();
+    if(key >= FL_KP && key <= FL_KP_Last || key>=32 && key<=126 || e==FL_PASTE)
+    {
+      for(int i=0;i<Fl::event_length();i++)
+        inpQ.push(Fl::event_text()[i]);
+      return 1;
+    }
+  }
+  return Fl_Text_Display::handle(e);
+}
+
+char RO_Editor::getchar()
+{
+  while(inpQ.empty())
+    Fl::wait();
+  char out = inpQ.front();
+  inpQ.pop();
+  if(buffer())
+  {
+    char buff[2];
+    buff[0]=out;
+    buff[1]='\0';
+    buffer()->append(buff);
+  }
+  return out;
+}
+
 CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field),w_cell(w_cell)
 {}
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
   config(h_cell_field,w_cell),
   editor(editor),
   dispIo(dispIo),
   scrollTape(scrollTape),
   packTape(packTape),
   dirty(false),
+  isInput(false),
   lastStep(1)
 {
   reset_exec();
@@ -51,17 +85,23 @@ void IdeState::edit_program()
 
 unsigned char IdeState::input()
 {
-  static int charnum=0;
-  static const std::string myStr = "He!llo";
-  return myStr[((charnum++)%6)];
+  if(!isInput)
+  {
+    char buff[3] = "\n>";
+    dispIo->buffer()->append(buff);
+    isInput=true;
+  }
+  return dispIo->getchar();
 }
 
 void IdeState::output(unsigned char out)
 {
-  char buff[2];
-  buff[1]='\0';
-  buff[0]=out;
-  dispIo->buffer()->append(buff);
+  char buff[3];
+  buff[2]='\0';
+  buff[1]=out;
+  buff[0]='\n';
+  dispIo->buffer()->append(isInput ? buff : buff+1);
+  isInput=false;
   dispIo->redraw();
 }
 

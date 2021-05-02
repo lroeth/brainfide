@@ -6,6 +6,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Repeat_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
 #include "bfide.h"
@@ -38,12 +39,12 @@ int main(int argc, char **argv)
         Fl_Pack *packButtons = new Fl_Pack(0,0,W_BUTTON,0);
           Fl_Button *buttonRun = new Fl_Button(0,0,0,H_BUTTON,"Run");
           Fl_Pack *packStep = new Fl_Pack(0,0,0,H_BUTTON);
-            Fl_Button *buttonBack = new Fl_Button(0,0,W_BUTTON/2,0,"@<");
-            Fl_Button *buttonForward = new Fl_Button(0,0,W_BUTTON/2,0,"@>");
+            Fl_Repeat_Button *buttonBack = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@<");
+            Fl_Repeat_Button *buttonForward = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@>");
           packStep->end();
         packButtons->end();
       packEditor->end();
-      Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
+      RO_Editor *dispIo = new RO_Editor(0,0,0,H_DISP);
       Fl_Scroll *scrollTape = new Fl_Scroll(0,0,0,H_TAPE);
         Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
         packTape->end();

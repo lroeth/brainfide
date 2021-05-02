@@ -10,10 +10,12 @@ struct RO_Editor : public Fl_Text_Display
 {
   RO_Editor(int X, int Y, int W, int H, const char* label=0) :
     Fl_Text_Display(X,Y,W,H,label),
-    inpQ()
+    inpQ(),
+    isBlocked(false)
     {}
   int handle(int e);
   char getchar();
+  bool isBlocked;
   std::queue<char> inpQ;
 };
 

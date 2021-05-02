@@ -5,13 +5,11 @@
 #include <FL/Fl_Box.H>
 #include "bfide.h"
 
-
 int RO_Editor::handle(int e)
 {
-  if(e==FL_KEYBOARD || e==FL_PASTE)
+  if(isBlocked && e==FL_KEYBOARD)
   {
     int key = Fl::event_key();
-    if(key >= FL_KP && key <= FL_KP_Last || key>=32 && key<=126 || e==FL_PASTE)
     {
       for(int i=0;i<Fl::event_length();i++)
         inpQ.push(Fl::event_text()[i]);
@@ -23,8 +21,10 @@ int RO_Editor::handle(int e)
 
 char RO_Editor::getchar()
 {
+  isBlocked=true;
   while(inpQ.empty())
     Fl::wait();
+  isBlocked=false;
   char out = inpQ.front();
   inpQ.pop();
   if(buffer())
@@ -160,6 +160,7 @@ void IdeState::d_write_prog_pos(unsigned oldPos)
 void IdeState::d_clear_tape()
 {
   dispIo->buffer()->text(0);
+  isInput=false;
   packTape->clear();
   d_add_cell();
   highlight_cell(0);
@@ -168,6 +169,8 @@ void IdeState::d_clear_tape()
 void run_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
+  if(state->dispIo->isBlocked)
+    return;
   if(state->dirty || state->lastStep<0)
     state->edit_program();
   else if(state->lastStep == 1)
@@ -178,6 +181,8 @@ void run_cb(Fl_Widget *w, void *p)
 void step_fwd_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
+  if(state->dispIo->isBlocked)
+    return;
   if(state->dirty)
     state->edit_program();
   else

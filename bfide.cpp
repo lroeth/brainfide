@@ -5,8 +5,43 @@
 #include <FL/Fl_Box.H>
 #include "bfide.h"
 
+
+
+
+void RO_Editor::set_getchar(char (*getchar_fp)(RO_Editor *,void *), void *p)
+{
+  this->getchar_fp = getchar_fp;
+  this->p = p;
+  handle_fp = &default_handle;
+}
+
+
+bool RO_Editor::is_blocked()
+  {return isBlocked;}
+
+
+char RO_Editor::getchar()
+{
+  char out;
+  isBlocked=true;
+  out = getchar_fp(this, p);
+  isBlocked=false;
+  if(buffer())
+  {
+    char buff[2];
+    buff[0]=out;
+    buff[1]='\0';
+    buffer()->append(buff);
+  }
+  return out;
+}
+
+
 int RO_Editor::handle(int e)
   {return handle_fp(this,e);}
+
+
+
 
 int RO_Editor::kb_handle(RO_Editor *t,int e)
 {
@@ -22,29 +57,26 @@ int RO_Editor::kb_handle(RO_Editor *t,int e)
   return RO_Editor::default_handle(t,e);
 }
 
+
 int RO_Editor::default_handle(RO_Editor *t, int e)
   {return t->Fl_Text_Display::handle(e);}
 
-char RO_Editor::getchar()
+
+char RO_Editor::q_getchar(RO_Editor *t, void *p)
 {
-  isBlocked=true;
-  while(inpQ.empty())
-    block(p);
-  isBlocked=false;
-  char out = inpQ.front();
-  inpQ.pop();
-  if(buffer())
-  {
-    char buff[2];
-    buff[0]=out;
-    buff[1]='\0';
-    buffer()->append(buff);
-  }
+  while(t->inpQ.empty())
+    Fl::wait();
+  char out = t->inpQ.front();
+  t->inpQ.pop();
   return out;
 }
 
+
+
+
 CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field),w_cell(w_cell)
 {}
+
 
 IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
   config(h_cell_field,w_cell),
@@ -175,7 +207,7 @@ void IdeState::d_clear_tape()
 void run_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
-  if(state->dispIo->isBlocked)
+  if(state->dispIo->is_blocked())
     return;
   if(state->dirty || state->lastStep<0)
     state->edit_program();
@@ -187,7 +219,7 @@ void run_cb(Fl_Widget *w, void *p)
 void step_fwd_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
-  if(state->dispIo->isBlocked)
+  if(state->dispIo->is_blocked())
     return;
   if(state->dirty)
     state->edit_program();

@@ -85,6 +85,7 @@ void IdeState::edit_program()
 
 unsigned char IdeState::input()
 {
+  dispIo->take_focus();
   if(!isInput)
   {
     char buff[3] = "\n>";

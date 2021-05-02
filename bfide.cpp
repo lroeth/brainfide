@@ -12,10 +12,11 @@ CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field
 {}
 
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
   config(h_cell_field,w_cell),
   editor(editor),
   dispIo(dispIo),
+  inpIo(inpIo),
   scrollTape(scrollTape),
   packTape(packTape),
   dirty(false),
@@ -23,6 +24,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Edit
   lastStep(1)
 {
   reset_exec();
+  dispIo->set_getchar(&getchar,inpIo);
 }
 
 
@@ -57,7 +59,7 @@ void IdeState::edit_program()
 
 unsigned char IdeState::input()
 {
-  dispIo->take_focus();
+  inpIo->take_focus();
   if(!isInput)
   {
     char buff[3] = "\n>";
@@ -137,6 +139,24 @@ void IdeState::d_clear_tape()
   d_add_cell();
   highlight_cell(0);
 }
+
+
+
+
+char IdeState::getchar(void *p)
+{
+  Fl_Input *inpIo = (Fl_Input *)p;
+  int size;
+  while(!(size=inpIo->size()))
+    Fl::wait();
+  char out = inpIo->value()[0];
+  inpIo->replace(0,1,0);
+  inpIo->position(size-1);
+  return out;
+}
+
+
+
 
 void run_cb(Fl_Widget *w, void *p)
 {

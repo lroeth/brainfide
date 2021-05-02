@@ -2,6 +2,7 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Pack.H>
+#include <FL/Fl_Input.H>
 #include "bfint.h"
 #include "roeditor.h"
 
@@ -15,7 +16,7 @@ struct CellConfig
 class IdeState : public BFInt
 {
   public:
-    IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
+    IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
 //  private:
     void highlight_cell(unsigned cell);
     void unhighlight_cell(unsigned cell);
@@ -32,9 +33,12 @@ class IdeState : public BFInt
     void d_write_prog_pos(unsigned oldPos);
     void d_clear_tape();
 
+    static char getchar(void *p);
+
     const struct CellConfig config;
     Fl_Text_Editor *editor;
     RO_Editor *dispIo;
+    Fl_Input *inpIo;
     Fl_Scroll *scrollTape;
     Fl_Pack *packTape;
     bool dirty;

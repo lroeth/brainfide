@@ -10,7 +10,7 @@ rtest : test
 main : main.o bfide.o bfint.o
 	g++ $(fltk_link_flags) -o $@ $^
 
-test : test.o
+test : test.o bfide.o bfint.o
 	g++ $(fltk_link_flags) -o $@ $^
 
 %.o : %.cpp *.h

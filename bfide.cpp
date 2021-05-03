@@ -147,8 +147,8 @@ char IdeState::getchar(void *p)
 {
   Fl_Input *inpIo = (Fl_Input *)p;
   int size;
-  while(!(size=inpIo->size()))
-    Fl::wait();
+  if(!(size=inpIo->size()))
+    return 0;
   char out = inpIo->value()[0];
   inpIo->replace(0,1,0);
   inpIo->position(size-1);
@@ -167,6 +167,7 @@ void run_cb(Fl_Widget *w, void *p)
     state->edit_program();
   else if(state->lastStep == 1)
     state->reset_exec();
+  state->wasRun=true;
   while(!(state->lastStep = state->step()));
 }
 
@@ -179,6 +180,7 @@ void step_fwd_cb(Fl_Widget *w, void *p)
     state->edit_program();
   else
   {
+    state->wasRun=false;
     state->lastStep = state->step();
     if(state->lastStep == 1 || state->lastStep < 0)
     {

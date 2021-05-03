@@ -1,5 +1,6 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Input.H>
@@ -43,6 +44,7 @@ class IdeState : public BFInt
     Fl_Pack *packTape;
     bool dirty;
     bool isInput;
+    bool wasRun;
     signed char lastStep;
 };
 void run_cb(Fl_Widget *w, void *p);

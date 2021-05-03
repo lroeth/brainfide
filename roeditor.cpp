@@ -5,7 +5,6 @@ void RO_Editor::set_getchar(char (*getchar_fp)(void *), void *p)
 {
   this->getchar_fp = getchar_fp;
   this->p = p;
-  handle_fp = &default_handle;
 }
 
 
@@ -26,41 +25,5 @@ char RO_Editor::getchar()
     buff[1]='\0';
     buffer()->append(buff);
   }
-  return out;
-}
-
-
-int RO_Editor::handle(int e)
-  {return handle_fp(this,e);}
-
-
-
-
-int RO_Editor::kb_handle(RO_Editor *t,int e)
-{
-  if(t->isBlocked && e==FL_KEYBOARD)
-  {
-    int key = Fl::event_key();
-    {
-      for(int i=0;i<Fl::event_length();i++)
-        t->inpQ.push(Fl::event_text()[i]);
-      return 1;
-    }
-  }
-  return RO_Editor::default_handle(t,e);
-}
-
-
-int RO_Editor::default_handle(RO_Editor *t, int e)
-  {return t->Fl_Text_Display::handle(e);}
-
-
-char RO_Editor::q_getchar(void *p)
-{
-  RO_Editor *t = (RO_Editor*)p;
-  while(t->inpQ.empty())
-    Fl::wait();
-  char out = t->inpQ.front();
-  t->inpQ.pop();
   return out;
 }

@@ -1,6 +1,5 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Buffer.H>
-#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Input.H>
@@ -24,6 +23,7 @@ class IdeState : public BFInt
     void edit_program();
 
     unsigned char input();
+    bool input_ready();
     void output(unsigned char out);
     void err_output(std::string message, bool is_warning);
 
@@ -45,6 +45,7 @@ class IdeState : public BFInt
     bool dirty;
     bool isInput;
     bool wasRun;
+    bool blocking;
     signed char lastStep;
 };
 void run_cb(Fl_Widget *w, void *p);
@@ -52,3 +53,4 @@ void step_fwd_cb(Fl_Widget *w, void *p);
 void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
                const char* deletedText,
                void* p);
+void inp_edited_cb(Fl_Widget *w, void *p);

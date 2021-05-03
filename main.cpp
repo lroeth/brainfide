@@ -76,7 +76,9 @@ int main(int argc, char **argv)
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape);
   buttonRun->callback(&run_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);
-  buffProg->add_modify_callback(edited_cb, &state);
+  buffProg->add_modify_callback(&edited_cb, &state);
+  inpIo->callback(&inp_edited_cb, &state);
+  inpIo->when(FL_WHEN_CHANGED);
 
   /* run */
   window->show(argc, argv);

@@ -59,7 +59,6 @@ void IdeState::edit_program()
 
 unsigned char IdeState::input()
 {
-  inpIo->take_focus();
   if(!isInput)
   {
     char buff[3] = "\n>";
@@ -67,6 +66,11 @@ unsigned char IdeState::input()
     isInput=true;
   }
   return dispIo->getchar();
+}
+
+bool IdeState::input_ready()
+{
+  return (inpIo->size() > 0);
 }
 
 void IdeState::output(unsigned char out)
@@ -161,21 +165,22 @@ char IdeState::getchar(void *p)
 void run_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
-  if(state->dispIo->is_blocked())
-    return;
   if(state->dirty || state->lastStep<0)
     state->edit_program();
   else if(state->lastStep == 1)
     state->reset_exec();
   state->wasRun=true;
   while(!(state->lastStep = state->step()));
+  if(state->lastStep == 2)
+  {
+    state->blocking=true;
+    state->inpIo->take_focus();
+  }
 }
 
 void step_fwd_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
-  if(state->dispIo->is_blocked())
-    return;
   if(state->dirty)
     state->edit_program();
   else
@@ -187,6 +192,11 @@ void step_fwd_cb(Fl_Widget *w, void *p)
       state->reset_exec();
       state->lastStep = 0;
     }
+    else if(state->lastStep == 2)
+    {
+      state->blocking=true;
+      state->inpIo->take_focus();
+    }
   }
 }
 
@@ -196,4 +206,16 @@ void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
 {
   IdeState *state = (IdeState*) p;
   state->dirty |= (nInserted || nDeleted);
+}
+
+void inp_edited_cb (Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  if(!state->blocking)
+    return;
+  state->blocking = false;
+  if(state->wasRun)
+    run_cb(0,state);
+  else
+    step_fwd_cb(0,state);
 }

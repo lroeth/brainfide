@@ -61,7 +61,9 @@ signed char BFInt::step()
               break;
     case '+': write_cell(tape[tapePos]+1); break;
     case '-': write_cell(tape[tapePos]-1); break;
-    case ',': write_cell(input()); break;
+    case ',': if(!input_ready())
+                return 2;
+              write_cell(input()); break;
     case '.': output(tape[tapePos]); break;
     case ']': write_prog_pos(loops[progPos]); return 0;
     case '[': if(!tape[tapePos])

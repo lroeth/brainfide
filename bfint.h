@@ -8,8 +8,7 @@ class BFInt
     BFInt();
     bool update_program(std::string program);
     void reset_exec();
-    signed char step(); /* returns -1 for error stop, 1 for eof, positive for d_handle status, 0 for continue */
-
+    signed char step(); /* returns -1 for error stop, 1 for eof, 2 for input not ready, positive for d_handle status, 0 for continue */
   protected:
     unsigned get_prog_pos();
     unsigned get_tape_pos();
@@ -20,6 +19,7 @@ class BFInt
     void write_prog_pos(unsigned newPos);
 
     virtual unsigned char input()=0;
+    virtual bool input_ready() {return true;}
     virtual void output(unsigned char out)=0;
     virtual void err_output(std::string message, bool is_error)=0;
 

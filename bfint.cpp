@@ -1,5 +1,4 @@
-#include <iostream>
-#include <stack>
+#include <algorithm>
 #include "bfint.h"
 
 BFInt::BFInt() :
@@ -40,6 +39,9 @@ void BFInt::reset_exec()
   tape.assign(1,0);
   write_tape_pos(0);
   write_prog_pos(0);
+  loopReps.clear();
+  while(!overwrite.empty())
+    overwrite.pop();
   d_clear_tape();
 }
 
@@ -63,15 +65,26 @@ signed char BFInt::step()
     case '-': write_cell(tape[tapePos]-1); break;
     case ',': if(!input_ready())
                 return 2;
-              write_cell(input()); break;
+              write_cell_inp(input()); break;
     case '.': output(tape[tapePos]); break;
-    case ']': write_prog_pos(loops[progPos]); return 0;
-    case '[': if(!tape[tapePos])
-              {
-                write_prog_pos(loops[progPos]+1);
-                return 0;
+    case ']': write_prog_pos(loops[progPos]);
+              return 0;
+    case '[': {
+                std::pair<std::stack<unsigned>,bool> *curr = &loopReps[progPos];
+                if(curr->first.empty() || !curr->second)
+                {
+                  curr->first.push(0);
+                  curr->second=true;
+                }
+                if(!tape[tapePos])
+                {
+                  curr->second=false;
+                  write_prog_pos(loops[progPos]+1);
+                  return 0;
+                }
+                curr->first.top()++;
+                break;
               }
-              break;
     default : status = d_handle();
               if(status<0)
               {
@@ -81,6 +94,38 @@ signed char BFInt::step()
   }
   write_prog_pos(progPos+1);
   return status;
+}
+
+bool BFInt::backstep()
+{
+  if(progPos == 0)
+    return false;
+  write_prog_pos(progPos-1);
+  switch(program[progPos])
+  {
+    case '<': write_tape_pos(tapePos + 1); break;
+    case '>': write_tape_pos(tapePos - 1); break;
+    case '+': write_cell(tape[tapePos]-1); break;
+    case '-': write_cell(tape[tapePos]+1); break;
+    case ',': write_cell(overwrite.top());
+              overwrite.pop();
+              break;
+    case '.': break;
+    case ']': {
+                std::pair<std::stack<unsigned>,bool> *curr = &loopReps[loops[progPos]];
+                if(curr->first.top())
+                {
+                  curr->first.top()--;
+                  break;
+                }
+                curr->first.pop();
+                write_prog_pos(loops[progPos]);
+                break;
+              }
+    case '[': write_prog_pos(loops[progPos]+1); break;
+    default : d_backhandle();
+  }
+  return true;
 }
 
 unsigned BFInt::get_prog_pos()
@@ -101,6 +146,12 @@ unsigned char BFInt::get_cell(unsigned pos)
   if(pos>=tape.size())
     return 0;
   return tape[pos];
+}
+
+void BFInt::write_cell_inp(unsigned char val)
+{
+  overwrite.push(tape[tapePos]);
+  write_cell(val);
 }
 
 void BFInt::write_cell(unsigned char val)

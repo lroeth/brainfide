@@ -23,7 +23,7 @@
 #define H_DISP 100
 #define H_CELL_FIELD 20
 #define W_CELL 40
-#define MIN_W_EDITOR 100
+#define MIN_W_EDITOR 200
 
 /* convenience macros */
 #define H_CELL 3*H_CELL_FIELD
@@ -84,6 +84,7 @@ int main(int argc, char **argv)
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape);
   buttonRun->callback(&run_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);
+  buttonBack->callback(&step_back_cb, &state);
   buttonPrompt->callback(&prompt_cb, &state);
   buttonPrompt->setonly();
   buttonNull->callback(&null_cb, &state);

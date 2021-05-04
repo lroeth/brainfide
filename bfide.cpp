@@ -195,6 +195,15 @@ void step_fwd_cb(Fl_Widget *w, void *p)
   }
 }
 
+void step_back_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  if(state->dirty)
+    state->edit_program();
+  else
+    state->backstep();
+}
+
 void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
                const char* deletedText,
                void* p)

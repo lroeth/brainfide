@@ -59,7 +59,7 @@ Installation
         ./bfide # IDE
         ./clint filename.bf # CL interpreter, uses stdin and stdout
 
-### MinGW
+### MinGW-w64
 
 1. Make sure you have fltk's build dependencies.
 

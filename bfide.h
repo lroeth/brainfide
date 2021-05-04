@@ -28,6 +28,7 @@ class IdeState : public BFInt
     void err_output(std::string message, bool is_warning);
 
     signed char d_handle();
+    bool d_backhandle();
     void d_add_cell();
     void d_write_cell(unsigned char val);
     void d_write_tape_pos(unsigned oldPos);
@@ -47,7 +48,8 @@ class IdeState : public BFInt
     bool prompt;
     signed char lastStep;
 };
-void run_cb(Fl_Widget *w, void *p);
+void run_fwd_cb(Fl_Widget *w, void *p);
+void run_back_cb(Fl_Widget *w, void *p);
 void step_fwd_cb(Fl_Widget *w, void *p);
 void step_back_cb(Fl_Widget *w, void *p);
 void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,

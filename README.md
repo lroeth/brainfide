@@ -17,7 +17,7 @@ Operation
 
 At cell index 0, `<` is an invalid command. `[` and `]` must be matched.
 
-The IDE additionally supports breakpoints, indicated by `$`.
+The IDE additionally supports breakpoints, indicated by `$`, which stop execution when running in either direction.
 
 ### bfide
 

@@ -102,7 +102,12 @@ void IdeState::err_output(std::string message, bool is_warning)
 
 signed char IdeState::d_handle()
 {
-  return get_cmd(get_prog_pos()) == '$' ? 2 : 0;
+  return get_cmd(get_prog_pos()) == '$' ? 3 : 0;
+}
+
+bool IdeState::d_backhandle()
+{
+  return get_cmd(get_prog_pos()) == '$' ? false : true;
 }
 
 void IdeState::d_add_cell()
@@ -157,7 +162,7 @@ void IdeState::d_clear_tape()
 
 
 
-void run_cb(Fl_Widget *w, void *p)
+void run_fwd_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
   if(state->dirty || state->lastStep<0)
@@ -171,6 +176,15 @@ void run_cb(Fl_Widget *w, void *p)
     state->blocking=true;
     state->inpIo->take_focus();
   }
+}
+
+void run_back_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  if(state->dirty)
+    state->edit_program();
+  else
+    while(state->backstep());
 }
 
 void step_fwd_cb(Fl_Widget *w, void *p)
@@ -219,7 +233,7 @@ void inp_edited_cb (Fl_Widget *w, void *p)
     return;
   state->blocking = false;
   if(state->wasRun)
-    run_cb(0,state);
+    run_fwd_cb(0,state);
   else
     step_fwd_cb(0,state);
 }

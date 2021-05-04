@@ -123,7 +123,7 @@ bool BFInt::backstep()
                 break;
               }
     case '[': write_prog_pos(loops[progPos]+1); break;
-    default : d_backhandle();
+    default : return d_backhandle();
   }
   return true;
 }

@@ -86,7 +86,8 @@ int main(int argc, char **argv)
   dispIo->buffer(buffIo);
   dispIo->textfont(FL_COURIER);
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape);
-  buttonRun->callback(&run_cb, &state);
+  buttonRun->callback(&run_fwd_cb, &state);
+  buttonRevRun->callback(&run_back_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);
   buttonBack->callback(&step_back_cb, &state);
   buttonPrompt->callback(&prompt_cb, &state);

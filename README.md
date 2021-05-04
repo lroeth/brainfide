@@ -32,7 +32,7 @@ Runs, steps, and examines the state of a BF program.
 5. Tape pointer: Shows the current cell of the tape.
 6. Run/continue: If at EOF, reset the program and begin running until EOF or a breakpoint. If already executing, but stopped, continue executing until EOF or a breakpoint.
 7. Step forward: If at EOF, reset the program. Otherwise, execute the next instruction.
-8. Step backward: Not implemented yet.
+8. Step backward: If at beginning of file, do nothing. Otherwise, step backwards one instruction.
 9. Input field: Program input is taken from here. Input is consumed as it is used; only used input gets written to the I/O console.
 10. Prompt: Determines execution behavior when the input field is blank, but the program needs more input. If User, focus goes to the input box, and execution stops until the user adds input. If Null, all inputs are nonblocking, and input commands when the input field is empty write the null character.
 

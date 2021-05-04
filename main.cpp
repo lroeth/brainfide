@@ -40,7 +40,10 @@ int main(int argc, char **argv)
       Fl_Pack *packEditor = new Fl_Pack(0,0,W_WINDOW,H_EDITOR);
         Fl_Text_Editor *editor = new Fl_Text_Editor(0,0,W_EDITOR,0);
         Fl_Pack *packButtons = new Fl_Pack(0,0,W_BUTTON,0);
-          Fl_Button *buttonRun = new Fl_Button(0,0,0,H_BUTTON,"Run");
+          Fl_Pack *packRun = new Fl_Pack(0,0,0,H_BUTTON);
+            Fl_Button *buttonRevRun = new Fl_Button(0,0,W_BUTTON/2,0,"@|<");
+            Fl_Button *buttonRun = new Fl_Button(0,0,W_BUTTON/2,0,"@>|");
+          packRun->end();
           Fl_Pack *packStep = new Fl_Pack(0,0,0,H_BUTTON);
             Fl_Repeat_Button *buttonBack = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@<");
             Fl_Repeat_Button *buttonForward = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@>");
@@ -64,6 +67,7 @@ int main(int argc, char **argv)
   /* configure widgets and resize behaviour */
   packPrompt->type(Fl_Pack::HORIZONTAL);
   packStep->type(Fl_Pack::HORIZONTAL);
+  packRun->type(Fl_Pack::HORIZONTAL);
   packButtons->type(Fl_Pack::VERTICAL);
   packEditor->type(Fl_Pack::HORIZONTAL);
   packTape->type(Fl_Pack::HORIZONTAL);

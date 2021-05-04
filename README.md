@@ -6,14 +6,14 @@ Operation
 
 ### BF language & interpreter
  
-`+` Increment the current cell modulo 256.
-`-`  Decrement the current cell modulo 256.
-`<`  Shift left on the tape.
-`>`  Shift right on tape.
-`,`  Read one character of input, and write its ASCII value to the current cell.
-`.`  Write ASCII representation of current cell`s value to output.
-`[`  If current cell value is 0, continue executing after next `]`. Otherwise, continue executing.
-`]`  Terminate loop begun by `[`.
+* `+` Increment the current cell modulo 256.
+* `-`  Decrement the current cell modulo 256.
+* `<`  Shift left on the tape.
+* `>`  Shift right on tape.
+* `,`  Read one character of input, and write its ASCII value to the current cell.
+* `.`  Write ASCII representation of current cell`s value to output.
+* `[`  If current cell value is 0, continue executing after next `]`. Otherwise, continue executing.
+* `]`  Terminate loop begun by `[`.
 
 At cell index 0, '<' is an invalid command. '[' and ']' must be matched.
 

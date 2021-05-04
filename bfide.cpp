@@ -12,7 +12,7 @@ CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field
 {}
 
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Editor *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
   config(h_cell_field,w_cell),
   editor(editor),
   dispIo(dispIo),
@@ -25,7 +25,6 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Edit
   lastStep(1)
 {
   reset_exec();
-  dispIo->set_getchar(&getchar,inpIo);
 }
 
 
@@ -66,7 +65,16 @@ unsigned char IdeState::input()
     dispIo->buffer()->append(buff);
     isInput=true;
   }
-  return dispIo->getchar();
+  int size;
+  if(!(size=inpIo->size()))
+    return 0;
+  char buff[2];
+  buff[0] = inpIo->value()[0];
+  inpIo->replace(0,1,0);
+  inpIo->position(size-1);
+  buff[1]='\0';
+  dispIo->buffer()->append(buff);
+  return buff[0];  
 }
 
 bool IdeState::input_ready()
@@ -84,7 +92,6 @@ void IdeState::output(unsigned char out)
   buff[0]='\n';
   dispIo->buffer()->append(isInput ? buff : buff+1);
   isInput=false;
-  dispIo->redraw();
 }
 
 void IdeState::err_output(std::string message, bool is_warning)
@@ -145,21 +152,6 @@ void IdeState::d_clear_tape()
   packTape->clear();
   d_add_cell();
   highlight_cell(0);
-}
-
-
-
-
-char IdeState::getchar(void *p)
-{
-  Fl_Input *inpIo = (Fl_Input *)p;
-  int size;
-  if(!(size=inpIo->size()))
-    return 0;
-  char out = inpIo->value()[0];
-  inpIo->replace(0,1,0);
-  inpIo->position(size-1);
-  return out;
 }
 
 

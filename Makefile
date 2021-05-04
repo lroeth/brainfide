@@ -12,7 +12,7 @@ run : bfide
 clean :
 	-rm bfide clint *.o
 
-bfide : main.o bfide.o bfint.o roeditor.o
+bfide : main.o bfide.o bfint.o
 	$(cxx)  -o $@ $^ $(fltk_link_flags)
 
 clint : clint.o bfint.o
@@ -26,9 +26,7 @@ bfide.o : bfide.cpp bfide.h
 	$(cxx) -c $(fltk_comp_flags) -o $@ $<
 main.o : main.cpp bfide.h
 	$(cxx) -c $(fltk_comp_flags) -o $@ $<
-roeditor.o : roeditor.cpp roeditor.h
-	$(cxx) -c $(fltk_comp_flags) -o $@ $<
-bfide.h : bfint.h roeditor.h
+bfide.h : bfint.h
 	touch bfide.h
 clint.h : bfint.h
 	touch clint.h

@@ -53,7 +53,7 @@ int main(int argc, char **argv)
         packPrompt->end();
         packButtons->end();
       packEditor->end();
-      RO_Editor *dispIo = new RO_Editor(0,0,0,H_DISP);
+      Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
       Fl_Scroll *scrollTape = new Fl_Scroll(0,0,W_WINDOW,H_TAPE);
         Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
         packTape->end();

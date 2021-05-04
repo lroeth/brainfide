@@ -1,10 +1,13 @@
 FLTKCONFIG = fltk-config
 
-cxx = $(shell $(FLTKCONFIG) --cxx)
-fltk_comp_flags = $(shell $(FLTKCONFIG) --cxxflags)
-fltk_link_flags = $(shell $(FLTKCONFIG) --ldflags)
-
 all : bfide clint
+
+flags.mk :
+	echo cxx = $(shell $(FLTKCONFIG) --cxx) >flags.mk
+	echo fltk_comp_flags = $(shell $(FLTKCONFIG) --cxxflags) >>flags.mk
+	echo fltk_link_flags = $(shell $(FLTKCONFIG) --ldflags) >>flags.mk
+
+include flags.mk
 
 run : bfide
 	./bfide

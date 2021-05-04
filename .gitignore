@@ -1,3 +1,4 @@
 bfide
 clint
 *.o
+flags.mk

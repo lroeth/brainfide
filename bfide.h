@@ -46,6 +46,7 @@ class IdeState : public BFInt
     bool isInput;
     bool wasRun;
     bool blocking;
+    bool prompt;
     signed char lastStep;
 };
 void run_cb(Fl_Widget *w, void *p);
@@ -54,3 +55,5 @@ void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
                const char* deletedText,
                void* p);
 void inp_edited_cb(Fl_Widget *w, void *p);
+void prompt_cb(Fl_Widget *w, void *p);
+void null_cb(Fl_Widget *w, void *p);

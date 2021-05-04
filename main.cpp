@@ -1,11 +1,13 @@
 #include <FL/Fl.H>
 #include <FL/Fl_Pack.H>
+#include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Radio_Button.H>
 #include <FL/Fl_Repeat_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
@@ -16,8 +18,8 @@
 /* config macros */
 #define W_WINDOW 800
 #define H_WINDOW 600
-#define W_BUTTON 100
-#define H_BUTTON 40
+#define W_BUTTON 150
+#define H_BUTTON 30
 #define H_DISP 100
 #define H_CELL_FIELD 20
 #define W_CELL 40
@@ -44,6 +46,11 @@ int main(int argc, char **argv)
             Fl_Repeat_Button *buttonForward = new Fl_Repeat_Button(0,0,W_BUTTON/2,0,"@>");
           packStep->end();
         Fl_Input *inpIo = new Fl_Input(0,0,0,H_BUTTON);
+        Fl_Box *boxPromptLabel = new Fl_Box(0,0,0,H_BUTTON,"More input:");
+        Fl_Pack *packPrompt = new Fl_Pack(0,0,0,H_BUTTON);
+          Fl_Radio_Button *buttonPrompt = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"User");
+          Fl_Radio_Button *buttonNull = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"Null");
+        packPrompt->end();
         packButtons->end();
       packEditor->end();
       RO_Editor *dispIo = new RO_Editor(0,0,0,H_DISP);
@@ -55,6 +62,7 @@ int main(int argc, char **argv)
   window->end();
 
   /* configure widgets and resize behaviour */
+  packPrompt->type(Fl_Pack::HORIZONTAL);
   packStep->type(Fl_Pack::HORIZONTAL);
   packButtons->type(Fl_Pack::VERTICAL);
   packEditor->type(Fl_Pack::HORIZONTAL);
@@ -76,6 +84,9 @@ int main(int argc, char **argv)
   IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape);
   buttonRun->callback(&run_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);
+  buttonPrompt->callback(&prompt_cb, &state);
+  buttonPrompt->setonly();
+  buttonNull->callback(&null_cb, &state);
   buffProg->add_modify_callback(&edited_cb, &state);
   inpIo->callback(&inp_edited_cb, &state);
   inpIo->when(FL_WHEN_CHANGED);

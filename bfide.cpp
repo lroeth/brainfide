@@ -21,6 +21,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, RO_Edit
   packTape(packTape),
   dirty(false),
   isInput(false),
+  prompt(true),
   lastStep(1)
 {
   reset_exec();
@@ -70,6 +71,8 @@ unsigned char IdeState::input()
 
 bool IdeState::input_ready()
 {
+  if(!prompt)
+    return true;
   return (inpIo->size() > 0);
 }
 
@@ -218,4 +221,16 @@ void inp_edited_cb (Fl_Widget *w, void *p)
     run_cb(0,state);
   else
     step_fwd_cb(0,state);
+}
+
+void prompt_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->prompt=true;
+}
+
+void null_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->prompt=false;
 }

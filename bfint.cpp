@@ -67,24 +67,8 @@ signed char BFInt::step()
                 return 2;
               write_cell_inp(input()); break;
     case '.': output(tape[tapePos]); break;
-    case ']': write_prog_pos(loops[progPos]);
-              return 0;
-    case '[': {
-                std::pair<std::stack<unsigned>,bool> *curr = &loopReps[progPos];
-                if(curr->first.empty() || !curr->second)
-                {
-                  curr->first.push(0);
-                  curr->second=true;
-                }
-                if(!tape[tapePos])
-                {
-                  curr->second=false;
-                  write_prog_pos(loops[progPos]+1);
-                  return 0;
-                }
-                curr->first.top()++;
-                break;
-              }
+    case ']': if(step_loop(loops[progPos],progPos,false)) return 0; break;
+    case '[': if(step_loop(progPos,loops[progPos],true)) return 0; break;
     default : status = d_handle();
               if(status<0)
               {
@@ -107,22 +91,10 @@ bool BFInt::backstep()
     case '>': write_tape_pos(tapePos - 1); break;
     case '+': write_cell(tape[tapePos]-1); break;
     case '-': write_cell(tape[tapePos]+1); break;
-    case ',': write_cell(overwrite.top());
-              overwrite.pop();
-              break;
+    case ',': unwrite_cell_inp();          break;
     case '.': break;
-    case ']': {
-                std::pair<std::stack<unsigned>,bool> *curr = &loopReps[loops[progPos]];
-                if(curr->first.top())
-                {
-                  curr->first.top()--;
-                  break;
-                }
-                curr->first.pop();
-                write_prog_pos(loops[progPos]);
-                break;
-              }
-    case '[': write_prog_pos(loops[progPos]+1); break;
+    case ']': backstep_loop(loops[progPos],progPos); break;
+    case '[': backstep_loop(progPos,loops[progPos]); break;
     default : return d_backhandle();
   }
   return true;
@@ -148,16 +120,24 @@ unsigned char BFInt::get_cell(unsigned pos)
   return tape[pos];
 }
 
+void BFInt::write_cell(unsigned char val)
+{
+  /* for changing the cell in reverse, or via plus/minus */
+  tape[tapePos] = val;
+  d_write_cell(val);
+}
+
 void BFInt::write_cell_inp(unsigned char val)
 {
+  /* stores original value, since otherwise input is non-reversible */
   overwrite.push(tape[tapePos]);
   write_cell(val);
 }
 
-void BFInt::write_cell(unsigned char val)
+void BFInt::unwrite_cell_inp()
 {
-  tape[tapePos] = val;
-  d_write_cell(val);
+  write_cell(overwrite.top());
+  overwrite.pop();
 }
 
 void BFInt::write_tape_pos(unsigned newPos)
@@ -178,4 +158,35 @@ void BFInt::write_prog_pos(unsigned newPos)
   unsigned oldPos = progPos;
   progPos=newPos;
   d_write_prog_pos(oldPos);
+}
+
+
+
+
+bool BFInt::step_loop(unsigned left, unsigned right, bool isLeft)
+{
+  std::stack<unsigned> *curr = &loopReps[left];
+  if(isLeft)
+    curr->push(0);
+  else
+    curr->top()++;
+  if(isLeft == !tape[tapePos]) /* a xor b */
+  {
+    write_prog_pos(isLeft ? right+1 : left+1);
+    return true;
+  }
+  return false;
+}
+
+void BFInt::backstep_loop(unsigned left, unsigned right)
+{
+  std::stack<unsigned> *curr = &loopReps[left];
+  if(curr->top())
+  {
+    curr->top()--;
+    write_prog_pos(right);
+    return;
+  }
+  curr->pop();
+  write_prog_pos(left);
 }

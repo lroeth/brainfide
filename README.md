@@ -15,9 +15,9 @@ Operation
 * `[`  If current cell value is 0, continue executing after next `]`. Otherwise, continue executing.
 * `]`  Terminate loop begun by `[`.
 
-At cell index 0, '<' is an invalid command. '[' and ']' must be matched.
+At cell index 0, `<` is an invalid command. `[` and `]` must be matched.
 
-The IDE additionally supports breakpoints, indicated by '$'.
+The IDE additionally supports breakpoints, indicated by `$`.
 
 ### bfide
 

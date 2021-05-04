@@ -37,6 +37,3 @@ bfide.h : bfint.h roeditor.h
 	touch bfide.h
 clint.h : bfint.h
 	touch clint.h
-
-
-.SECONDARY : *.o

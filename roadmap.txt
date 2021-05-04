@@ -1,0 +1,15 @@
+- output bf to text file
+ - make file chooser
+ - output to file
+- output c source
+ - make file chooser
+ - output to file
+  - convert to c
+- input from file
+ - add button
+ - make file chooser
+ - input to buffer
+ - add cl invocation
+- make menu instead of side buttons
+- switch to tiles for resizable proportions
+- syntax highlighting

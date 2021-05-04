@@ -17,16 +17,40 @@ class IdeState : public BFInt
 {
   public:
     IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
-//  private:
+    /* Execute/rewind one instruction */
+    void step_fwd();
+    void step_back();
+    /* Execute/rewind until end/beginning or breakpoint */
+    void run_fwd();
+    void run_back();
+    /* Stop blocking for input, because it is available */
+    void unblock();
+    /* Reload program */
+    void mark_dirty();
+    /* Set behavior on running out of input:
+    *    true  | prompt user for more input
+    *    false | send null character ('\0')
+    */
+    void prompt(bool isPrompt);
+
+  private:
+    /* block for user input */
+    void block();
+
+    /* check for new program, parse it and reset_exec if present */
+    bool clean();
+
+    /* handle tape pointer, for d_write_tape_pos */
     void highlight_cell(unsigned cell);
     void unhighlight_cell(unsigned cell);
-    void edit_program();
 
+    /* I/O virtual functions from bfint */
     unsigned char input();
     bool input_ready();
     void output(unsigned char out);
     void err_output(std::string message, bool is_warning);
 
+    /* UI update virtual functions from bfint*/
     signed char d_handle();
     bool d_backhandle();
     void d_add_cell();
@@ -35,26 +59,19 @@ class IdeState : public BFInt
     void d_write_prog_pos(unsigned oldPos);
     void d_clear_tape();
 
-    const struct CellConfig config;
+    /* UI components needed by member functions */
     Fl_Text_Editor *editor;
     Fl_Text_Display *dispIo;
     Fl_Input *inpIo;
     Fl_Scroll *scrollTape;
     Fl_Pack *packTape;
-    bool dirty;
-    bool isInput;
-    bool wasRun;
-    bool blocking;
-    bool prompt;
-    signed char lastStep;
+
+    /* State data */
+    const struct CellConfig config; /* information needed to construct cells */
+    bool isDirty; /* program has been edited since last parse */
+    bool isInput; /* output is ready for input */
+    bool isPrompt; /* if input runs out, prompt user. if false, just feed nulls */
+    bool isRun; /* before blocking for input, program was run, not stepped */
+    bool isBlocking; /* currently blocking for input; ignore most callbacks */
+    signed char lastStep; /* return status of last call to step() */
 };
-void run_fwd_cb(Fl_Widget *w, void *p);
-void run_back_cb(Fl_Widget *w, void *p);
-void step_fwd_cb(Fl_Widget *w, void *p);
-void step_back_cb(Fl_Widget *w, void *p);
-void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
-               const char* deletedText,
-               void* p);
-void inp_edited_cb(Fl_Widget *w, void *p);
-void prompt_cb(Fl_Widget *w, void *p);
-void null_cb(Fl_Widget *w, void *p);

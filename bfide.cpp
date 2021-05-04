@@ -6,6 +6,7 @@
 #include "bfide.h"
 
 
+/* Public *********************************************************************/
 
 
 CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field),w_cell(w_cell)
@@ -19,15 +20,97 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
   inpIo(inpIo),
   scrollTape(scrollTape),
   packTape(packTape),
-  dirty(false),
+  isDirty(false),
   isInput(false),
-  prompt(true),
+  isPrompt(true),
   lastStep(1)
 {
   reset_exec();
 }
 
 
+void IdeState::step_fwd()
+{
+  if(!clean())
+    return;
+  isRun=false;
+  lastStep = step();
+  if(lastStep == 1 || lastStep < 0)
+    reset_exec();
+  else if(lastStep == 2)
+    block();
+}
+
+
+void IdeState::step_back()
+{
+  isBlocking=false;
+  if(clean())
+    backstep();
+}
+
+
+void IdeState::run_fwd()
+{
+  clean();
+  if(lastStep == 1 || lastStep<0)
+    reset_exec();
+  isRun=true;
+  while(!(lastStep = step()));
+  if(lastStep == 2)
+    block();
+}
+
+
+void IdeState::run_back()
+{
+  isBlocking=false;
+  if(clean())
+    while(backstep());
+}
+
+
+void IdeState::unblock()
+{
+  if(isBlocking==false)
+    return;
+  isBlocking=false;
+  if(isRun)
+    run_fwd();
+  else
+    step_fwd();
+}
+
+
+void IdeState::mark_dirty()
+  {isDirty=true;}
+
+
+void IdeState::prompt(bool isPrompt)
+  {this->isPrompt=isPrompt;}
+
+
+/* Private ********************************************************************/
+
+
+void IdeState::block()
+{
+  isBlocking = true;
+  inpIo->take_focus();
+}
+
+
+bool IdeState::clean()
+{
+  if(!isDirty)
+    return true;
+  char *buff = editor->buffer()->text();
+  update_program(buff);
+  free(buff);
+  reset_exec();
+  isDirty = false;
+  return false;
+}
 
 
 void IdeState::highlight_cell(unsigned cell)
@@ -39,6 +122,7 @@ void IdeState::highlight_cell(unsigned cell)
   cellMemb->box(FL_UP_BOX);
 }
 
+
 void IdeState::unhighlight_cell(unsigned cell)
 {
   if(cell >= packTape->children())
@@ -48,28 +132,24 @@ void IdeState::unhighlight_cell(unsigned cell)
   cellMemb->box(FL_NO_BOX);
 }
 
-void IdeState::edit_program()
-{
-  char *buff = editor->buffer()->text();
-  update_program(buff);
-  free(buff);
-  reset_exec();
-  dirty = false;
-}
 
 unsigned char IdeState::input()
 {
   if(!isInput)
   {
+    /* make buffer ready to have input written to it */
     char buff[3] = "\n>";
     dispIo->buffer()->append(buff);
     isInput=true;
   }
   int size;
   if(!(size=inpIo->size()))
+    /* input never gets called if set to prompt with no input ready.
+    *  so if execution gets here, and none is ready, send null. */
     return 0;
   char buff[2];
   buff[0] = inpIo->value()[0];
+  /* consume character */
   inpIo->replace(0,1,0);
   inpIo->position(size-1);
   buff[1]='\0';
@@ -77,12 +157,14 @@ unsigned char IdeState::input()
   return buff[0];  
 }
 
+
 bool IdeState::input_ready()
 {
-  if(!prompt)
+  if(!isPrompt)
     return true;
   return (inpIo->size() > 0);
 }
+
 
 void IdeState::output(unsigned char out)
 {
@@ -90,28 +172,39 @@ void IdeState::output(unsigned char out)
   buff[2]='\0';
   buff[1]=out;
   buff[0]='\n';
+  /* put output on separate line from input */
   dispIo->buffer()->append(isInput ? buff : buff+1);
   isInput=false;
 }
 
+
 void IdeState::err_output(std::string message, bool is_warning)
 {
+//make popup later?
   if(!is_warning)
     dispIo->buffer()->append(("\nERROR: "+message).c_str());
 }
 
+
+
+
 signed char IdeState::d_handle()
 {
+  /* handle breakpoints */
   return get_cmd(get_prog_pos()) == '$' ? 3 : 0;
 }
 
+
 bool IdeState::d_backhandle()
 {
+  /* handle reverse breakpoints */
   return get_cmd(get_prog_pos()) == '$' ? false : true;
 }
 
+
 void IdeState::d_add_cell()
 {
+  /* add widget */
   const int h_cell_field = config.h_cell_field;
   const int h_cell = 3 * h_cell_field;
   const int w_cell = config.w_cell;
@@ -124,21 +217,26 @@ void IdeState::d_add_cell()
   char buff[20] = "";
   snprintf(buff,20,"%i",get_tape_pos());
   newCellIndex->copy_label(buff);
+  /* write 0 */
   d_write_cell(0);
 }
+
 
 void IdeState::d_write_cell(unsigned char val)
 {
   Fl_Group *cell=packTape->child(get_tape_pos())->as_group();
   Fl_Output *cellMemb = (Fl_Output*) cell->child(0);
   char buff[3] = "";
+  /* ascii */
   snprintf(buff,3,"%c",val);
   cellMemb->value(buff);
   cellMemb = (Fl_Output*) cell->child(1);
+  /* hex */
   snprintf(buff,3,"%2X",val);
   cellMemb->value(buff);
   scrollTape->redraw();
 }
+
 
 void IdeState::d_write_tape_pos(unsigned oldPos)
 {
@@ -147,105 +245,18 @@ void IdeState::d_write_tape_pos(unsigned oldPos)
   scrollTape->redraw();
 }
 
+
 void IdeState::d_write_prog_pos(unsigned oldPos)
   {editor->buffer()->highlight(get_prog_pos(),get_prog_pos()+1);}
 
+
 void IdeState::d_clear_tape()
 {
+  /* clears dispIo: for history, change to insert some newlines */
   dispIo->buffer()->text(0);
   isInput=false;
   packTape->clear();
   d_add_cell();
   highlight_cell(0);
-}
-
-
-
-
-void run_fwd_cb(Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  if(state->dirty || state->lastStep<0)
-    state->edit_program();
-  else if(state->lastStep == 1)
-    state->reset_exec();
-  state->wasRun=true;
-  while(!(state->lastStep = state->step()));
-  if(state->lastStep == 2)
-  {
-    state->blocking=true;
-    state->inpIo->take_focus();
-  }
-}
-
-void run_back_cb(Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  if(state->dirty)
-    state->edit_program();
-  else
-    while(state->backstep());
-}
-
-void step_fwd_cb(Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  if(state->dirty)
-    state->edit_program();
-  else
-  {
-    state->wasRun=false;
-    state->lastStep = state->step();
-    if(state->lastStep == 1 || state->lastStep < 0)
-    {
-      state->reset_exec();
-      state->lastStep = 0;
-    }
-    else if(state->lastStep == 2)
-    {
-      state->blocking=true;
-      state->inpIo->take_focus();
-    }
-  }
-}
-
-void step_back_cb(Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  if(state->dirty)
-    state->edit_program();
-  else
-    state->backstep();
-}
-
-void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
-               const char* deletedText,
-               void* p)
-{
-  IdeState *state = (IdeState*) p;
-  state->dirty |= (nInserted || nDeleted);
-}
-
-void inp_edited_cb (Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  if(!state->blocking)
-    return;
-  state->blocking = false;
-  if(state->wasRun)
-    run_fwd_cb(0,state);
-  else
-    step_fwd_cb(0,state);
-}
-
-void prompt_cb(Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  state->prompt=true;
-}
-
-void null_cb(Fl_Widget *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  state->prompt=false;
+  lastStep=0;
 }

@@ -32,6 +32,62 @@
 #define H_EDITOR H_WINDOW - H_DISP - H_TAPE
 
 
+
+
+void run_fwd_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->run_fwd();
+}
+
+void run_back_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->run_back();
+}
+
+void step_fwd_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->step_fwd();
+}
+
+void step_back_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->step_back();
+}
+
+void prompt_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->prompt(true);
+}
+
+void null_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->prompt(false);
+}
+
+void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
+               const char* deletedText,
+               void* p)
+{
+  IdeState *state = (IdeState*) p;
+  if(nInserted || nDeleted)
+    state->mark_dirty();
+}
+
+void inp_edited_cb (Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->unblock();
+}
+
+
+
+
 int main(int argc, char **argv)
 {
   /* widget hierarchy */

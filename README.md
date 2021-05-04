@@ -26,7 +26,7 @@ Runs, steps, and examines the state of a BF program.
 ![bfide UI](ui.png)
 
 1. BF program
-2. I/O console: input is prefixed with '>'. Errors, if any will also appear here.
+2. I/O console: input is prefixed with `>`. Errors, if any will also appear here.
 3. Tape: each cell, from top to bottom, has the ASCII and hexadecimal representations of its value, and then the cell index.
 4. Execution pointer: the next command to be executed. Highlights the following newline if at EOF.
 5. Tape pointer: Shows the current cell of the tape.
@@ -38,7 +38,7 @@ Runs, steps, and examines the state of a BF program.
 
 ### clint <filename>
 
-A simple interpreter. `clint` requires one argument, the filename of the BF script. It can be used as a shebang. ',' blocks until input is available on stdin, output is to stdout, and error messages are on stderr. Unrecognized commands are ignored.
+A simple interpreter. `clint` requires one argument, the filename of the BF script. It can be used as a shebang. `,` blocks until input is available on stdin, output is to stdout, and error messages are on stderr. Unrecognized commands are ignored.
 
 
 Installation

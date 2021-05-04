@@ -78,7 +78,8 @@ Installation
 3. Compile.
 
         cd /path/to/brainfide/
-        FLTKCONFIG='/path/to/fltk-source/build/fltk-config' mingw32-make -e
+        FLTKCONFIG='/path/to/fltk-source/build/fltk-config' mingw32-make -eB flags.mk
+        mingw32-make
 
 4. Run.
 

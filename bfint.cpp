@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <stdio.h>
 #include "bfint.h"
 
 BFInt::BFInt() :
@@ -17,7 +18,10 @@ bool BFInt::update_program(std::string program)
       case '[': parse.push(i); break;
       case ']': if(parse.empty())
                 {
-                  err_output("Unmatched ]",false);
+                  char buff[20];
+                  snprintf(buff,20,"Unmatched ] at %i",i);
+                  write_prog_pos(i);
+                  err_output(buff,false);
                   return false;
                 }
                 loops[i]=parse.top();
@@ -27,7 +31,10 @@ bool BFInt::update_program(std::string program)
   }
   if(!parse.empty())
   {
-    err_output("Unmatched [",false);
+    char buff[20];
+    snprintf(buff,20,"Unmatched [ at %i",parse.top());
+    write_prog_pos(parse.top());
+    err_output(buff,false);
     return false;
   }
   this->program = program;
@@ -45,11 +52,11 @@ void BFInt::reset_exec()
   d_clear_tape();
 }
 
-signed char BFInt::step()
+int BFInt::step()
 {
   if(progPos >= program.size())
     return 1;
-  signed char status = 0;
+  int status = 0;
   switch(program[progPos])
   {
     case '<': if(!tapePos)

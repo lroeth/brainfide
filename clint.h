@@ -7,5 +7,5 @@ class CLInt : public BFInt
     unsigned char input();
     void output(unsigned char out);
     void err_output(std::string message, bool is_warning);
-    signed char d_handle();
+    int d_handle();
 };

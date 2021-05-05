@@ -19,7 +19,7 @@ void CLInt::output(unsigned char out)
 void CLInt::err_output(std::string message, bool is_warning)
   {std::cerr<<(is_warning?"WARNING: ":"ERROR: ")<<message<<std::endl;}
 
-signed char CLInt::d_handle()
+int CLInt::d_handle()
   {return 0;/* ignore non command characters */}
 
 

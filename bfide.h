@@ -37,8 +37,12 @@ class IdeState : public BFInt
     /* block for user input */
     void block();
 
-    /* check for new program, parse it and reset_exec if present */
-    bool clean();
+    /* check for new program, parse it and reset_exec if present
+    *  1 was dirty, clean now
+    *  0 was clean
+    *  -1 was dirty, still dirty (update_program failed)
+    */
+    int clean();
 
     /* handle tape pointer, for d_write_tape_pos */
     void highlight_cell(unsigned cell);
@@ -51,7 +55,7 @@ class IdeState : public BFInt
     void err_output(std::string message, bool is_warning);
 
     /* UI update virtual functions from bfint*/
-    signed char d_handle();
+    int d_handle();
     bool d_backhandle();
     void d_add_cell();
     void d_write_cell(unsigned char val);
@@ -73,5 +77,5 @@ class IdeState : public BFInt
     bool isPrompt; /* if input runs out, prompt user. if false, just feed nulls */
     bool isRun; /* before blocking for input, program was run, not stepped */
     bool isBlocking; /* currently blocking for input; ignore most callbacks */
-    signed char lastStep; /* return status of last call to step() */
+    int lastStep; /* return status of last call to step() */
 };

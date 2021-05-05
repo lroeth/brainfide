@@ -31,7 +31,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
 
 void IdeState::step_fwd()
 {
-  if(!clean())
+  if(clean())
     return;
   isRun=false;
   lastStep = step();
@@ -45,14 +45,15 @@ void IdeState::step_fwd()
 void IdeState::step_back()
 {
   isBlocking=false;
-  if(clean())
+  if(!clean())
     backstep();
 }
 
 
 void IdeState::run_fwd()
 {
-  clean();
+  if(clean()<0)
+    return;
   if(lastStep == 1 || lastStep<0)
     reset_exec();
   isRun=true;
@@ -65,7 +66,7 @@ void IdeState::run_fwd()
 void IdeState::run_back()
 {
   isBlocking=false;
-  if(clean())
+  if(!clean())
     while(backstep());
 }
 
@@ -100,16 +101,17 @@ void IdeState::block()
 }
 
 
-bool IdeState::clean()
+int IdeState::clean()
 {
   if(!isDirty)
-    return true;
+    return 0;
   char *buff = editor->buffer()->text();
-  update_program(buff);
+  if(!update_program(buff))
+    return -1;
   free(buff);
   reset_exec();
   isDirty = false;
-  return false;
+  return 1;
 }
 
 
@@ -188,7 +190,7 @@ void IdeState::err_output(std::string message, bool is_warning)
 
 
 
-signed char IdeState::d_handle()
+int IdeState::d_handle()
 {
   /* handle breakpoints */
   return get_cmd(get_prog_pos()) == '$' ? 3 : 0;

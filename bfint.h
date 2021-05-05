@@ -10,7 +10,7 @@ class BFInt
     BFInt();
     bool update_program(std::string program);
     void reset_exec();
-    signed char step(); /* returns -1 for error stop, 1 for eof, 2 for input not ready, positive for d_handle status, 0 for continue */
+    int step(); /* returns -1 for error stop, 1 for eof, 2 for input not ready, positive for d_handle status, 0 for continue */
     bool backstep(); /* returns false if not at beginning of file or d_backhandle returned false */
 
   protected:
@@ -36,7 +36,7 @@ class BFInt
     virtual void err_output(std::string message, bool is_error)=0;
 
   private:
-    virtual signed char d_handle() {return -1;} /* return negative to indicate unhandled character, 1 for eof, positive to stop, 0 to continue */
+    virtual int d_handle() {return -1;} /* return negative to indicate unhandled character, 1 for eof, positive to stop, 0 to continue */
     virtual bool d_backhandle() {return true;} /* return true to not stop */
     virtual void d_add_cell() {}
     virtual void d_write_cell(unsigned char val) {}

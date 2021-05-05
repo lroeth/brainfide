@@ -12,6 +12,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Input.H>
+#include <FL/Fl_File_Chooser.H>
 #include "bfide.h"
 
 
@@ -79,12 +80,23 @@ void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
     state->mark_dirty();
 }
 
-void inp_edited_cb (Fl_Widget *w, void *p)
+void inp_edited_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = (IdeState*) p;
   state->unblock();
 }
 
+void export_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->export_file();
+}
+
+void import_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->import_file();
+}
 
 
 
@@ -110,8 +122,8 @@ int main(int argc, char **argv)
             Fl_Radio_Button *buttonPrompt = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"User");
             Fl_Radio_Button *buttonNull = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"Null");
           packPrompt->end();
-          Fl_Button *buttonExport = new Fl_Button(0,0,0,H_BUTTON,"Export BF");
-          Fl_Button *buttonExportC = new Fl_Button(0,0,0,H_BUTTON,"Export C");          
+          Fl_Button *buttonImport = new Fl_Button(0,0,0,H_BUTTON,"Open");
+          Fl_Button *buttonExport = new Fl_Button(0,0,0,H_BUTTON,"Save");
         packButtons->end();
       packEditor->end();
       Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
@@ -151,6 +163,8 @@ int main(int argc, char **argv)
   buttonPrompt->callback(&prompt_cb, &state);
   buttonPrompt->setonly();
   buttonNull->callback(&null_cb, &state);
+  buttonExport->callback(&export_cb,&state);
+  buttonImport->callback(&import_cb,&state);
   buffProg->add_modify_callback(&edited_cb, &state);
   inpIo->callback(&inp_edited_cb, &state);
   inpIo->when(FL_WHEN_CHANGED);

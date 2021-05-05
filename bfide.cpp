@@ -91,6 +91,26 @@ void IdeState::prompt(bool isPrompt)
   {this->isPrompt=isPrompt;}
 
 
+void IdeState::export_file(const char *filename)
+{
+  if(!filename)
+  {
+    //choose file
+  }
+  editor->buffer()->savefile("/home/wroth/classes/csc190/ide/test.bf");
+}
+
+
+void IdeState::import_file(const char *filename)
+{
+  if(!filename)
+  {
+    // choose file
+  }
+  editor->buffer()->loadfile("/home/wroth/classes/csc190/ide/test.bf");
+}
+
+
 /* Private ********************************************************************/
 
 

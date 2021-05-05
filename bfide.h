@@ -32,6 +32,11 @@ class IdeState : public BFInt
     *    false | send null character ('\0')
     */
     void prompt(bool isPrompt);
+    /* Export / import script to/from file
+    *  If filename is null, run file picker to get file
+    */
+    void export_file(const char *filename=0);
+    void import_file(const char *filename=0);
 
   private:
     /* block for user input */

@@ -20,12 +20,19 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
   inpIo(inpIo),
   scrollTape(scrollTape),
   packTape(packTape),
+  chooser(0),
   isDirty(false),
   isInput(false),
   isPrompt(true),
   lastStep(1)
 {
   reset_exec();
+}
+
+
+IdeState::~IdeState()
+{
+  delete chooser;
 }
 
 
@@ -95,9 +102,18 @@ void IdeState::export_file(const char *filename)
 {
   if(!filename)
   {
-    //choose file
+    if(!chooser)
+      chooser = new Fl_File_Chooser(0,"BF source (*.bf)\tC source (*.c)\tAll Files (*)",Fl_File_Chooser::CREATE,"Save as");
+    else
+    {
+      chooser->type(Fl_File_Chooser::CREATE);
+      chooser->label("Save as");
+    }
+    chooser->callback(&chooser_cb, this);
+    chooser->show();
   }
-  editor->buffer()->savefile("/home/wroth/classes/csc190/ide/test.bf");
+  else
+    editor->buffer()->savefile(filename);
 }
 
 
@@ -105,9 +121,18 @@ void IdeState::import_file(const char *filename)
 {
   if(!filename)
   {
-    // choose file
+    if(!chooser)
+      chooser = new Fl_File_Chooser(0,"BF Source (*.bf)\tAll Files (*)",Fl_File_Chooser::SINGLE,"Open");
+    else
+    {
+      chooser->type(Fl_File_Chooser::SINGLE);
+      chooser->label("Open");
+    }
+    chooser->callback(&chooser_cb, this);
+    chooser->show();
   }
-  editor->buffer()->loadfile("/home/wroth/classes/csc190/ide/test.bf");
+  else
+    editor->buffer()->loadfile(filename);
 }
 
 
@@ -281,4 +306,18 @@ void IdeState::d_clear_tape()
   d_add_cell();
   highlight_cell(0);
   lastStep=0;
+}
+
+
+void IdeState::chooser_cb(Fl_File_Chooser *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  if(!w->shown())
+  {
+    switch(w->type())
+    {
+      case Fl_File_Chooser::SINGLE : state->import_file(w->value());break;
+      case Fl_File_Chooser::CREATE : state->export_file(w->value());break;
+    }
+  }
 }

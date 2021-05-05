@@ -1,14 +1,6 @@
-- output bf to text file
- - make file chooser
- - output to file
 - output c source
- - make file chooser
- - output to file
-  - convert to c
+ - convert to c
 - input from file
- - add button
- - make file chooser
- - input to buffer
  - add cl invocation
 - refactor bfint as base class without reverse functionality, and derived class
  - add backinput

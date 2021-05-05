@@ -1,6 +1,7 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_File_Chooser.H>
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Input.H>
@@ -17,6 +18,7 @@ class IdeState : public BFInt
 {
   public:
     IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
+    ~IdeState();
     /* Execute/rewind one instruction */
     void step_fwd();
     void step_back();
@@ -68,12 +70,16 @@ class IdeState : public BFInt
     void d_write_prog_pos(unsigned oldPos);
     void d_clear_tape();
 
+    /* callback for File_Chooser */
+    static void chooser_cb(Fl_File_Chooser *w, void *p);
+
     /* UI components needed by member functions */
     Fl_Text_Editor *editor;
     Fl_Text_Display *dispIo;
     Fl_Input *inpIo;
     Fl_Scroll *scrollTape;
     Fl_Pack *packTape;
+    Fl_File_Chooser *chooser;
 
     /* State data */
     const struct CellConfig config; /* information needed to construct cells */

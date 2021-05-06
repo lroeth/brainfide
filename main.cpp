@@ -167,32 +167,32 @@ int main(int argc, char **argv)
 
   /* set up state object, menu, and callbacks */
   IdeState *statep = 0;
-  buffProg->add_modify_callback(&edited_cb, &statep);
-  inpIo->callback(&inp_edited_cb, &statep);
-  inpIo->when(FL_WHEN_CHANGED);
   Fl_Menu_Item menuItems[] =
     {
       {"&File",            0, 0,            0, FL_SUBMENU},
-        {"&Open",          0, open_cb,      &statep},
-        {"&Save",          0, save_cb,      &statep},
-        {"Save &as",       0, save_as_cb,   &statep},
+        {"&Open",          (FL_CTRL+'o'), open_cb,      &statep},
+        {"&Save",          (FL_CTRL+'s'), save_cb,      &statep},
+        {"Save &as",       (FL_CTRL+'S'), save_as_cb,   &statep},
       {0},
       {"&Run",             0, 0,            0, FL_SUBMENU},
-        {"&Run",           0, run_fwd_cb,   &statep},
-        {"Run back",       0, run_back_cb,  &statep, FL_MENU_DIVIDER},
-        {"&Step",          0, step_fwd_cb,  &statep},
-        {"Step &back",     0, step_back_cb, &statep},
+        {"&Run",           (FL_CTRL+'r'), run_fwd_cb,   &statep},
+        {"Run back",       (FL_CTRL+'R'), run_back_cb,  &statep, FL_MENU_DIVIDER},
+        {"&Step",          (FL_CTRL+'i'), step_fwd_cb,  &statep},
+        {"Step &back",     (FL_CTRL+'I'), step_back_cb, &statep},
       {0},
       {"&Options",         0, 0,            0, FL_SUBMENU},
         {"Get more input", 0, 0,            0, FL_SUBMENU},
-          {"&Prompt user", 0, prompt_cb,    &statep, FL_MENU_RADIO|FL_MENU_VALUE},
-          {"&Always null", 0, null_cb,      &statep, FL_MENU_RADIO},
+          {"&Prompt user", (FL_CTRL+'p'), prompt_cb,    &statep, FL_MENU_RADIO|FL_MENU_VALUE},
+          {"&Always null", (FL_CTRL+'n'), null_cb,      &statep, FL_MENU_RADIO},
         {0},
       {0},
     {0}};
   menu->menu(menuItems);
   IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,menuItems+2,openfile);
   statep = &state;
+  buffProg->add_modify_callback(&edited_cb, &statep);
+  inpIo->callback(&inp_edited_cb, &statep);
+  inpIo->when(FL_WHEN_CHANGED);
 
   return Fl::run();
 }

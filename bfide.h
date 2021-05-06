@@ -17,7 +17,7 @@ struct CellConfig
 class IdeState : public BFInt
 {
   public:
-    IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,const char *openfile);
+    IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,const char *openfile);
     ~IdeState();
     /* Execute/rewind one instruction */
     void step_fwd();
@@ -43,6 +43,7 @@ class IdeState : public BFInt
     void export_curr();
     void import_file(const char *filename=0);
 
+    void update_title();
   private:
     /* block for user input */
     void block();
@@ -57,6 +58,7 @@ class IdeState : public BFInt
     /* handle tape pointer, for d_write_tape_pos */
     void highlight_cell(unsigned cell);
     void unhighlight_cell(unsigned cell);
+
 
     /* I/O virtual functions from bfint */
     unsigned char input();
@@ -77,6 +79,7 @@ class IdeState : public BFInt
     static void chooser_cb(Fl_File_Chooser *w, void *p);
 
     /* UI components needed by member functions */
+    Fl_Window *window;
     Fl_Text_Editor *editor;
     Fl_Text_Display *dispIo;
     Fl_Input *inpIo;

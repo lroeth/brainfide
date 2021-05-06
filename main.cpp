@@ -179,8 +179,10 @@ int main(int argc, char **argv)
       openfile = argv[i];
   }
 
+  window->show(argc, argv);
+
   /* set up state object and callbacks */
-  IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape,openfile);
+  IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,openfile);
   buttonRun->callback(&run_fwd_cb, &state);
   buttonRevRun->callback(&run_back_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);
@@ -195,7 +197,5 @@ int main(int argc, char **argv)
   inpIo->callback(&inp_edited_cb, &state);
   inpIo->when(FL_WHEN_CHANGED);
 
-  /* run */
-  window->show(argc, argv);
   return Fl::run();
 }

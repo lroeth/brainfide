@@ -3,6 +3,7 @@
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Box.H>
+#include <FL/filename.H>
 #include "bfide.h"
 
 
@@ -13,8 +14,9 @@ CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field
 {}
 
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape, const char *openfile) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape, const char *openfile) :
   config(h_cell_field,w_cell),
+  window(window),
   editor(editor),
   dispIo(dispIo),
   inpIo(inpIo),
@@ -29,6 +31,8 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
 {
   if(openfile)
     import_file(openfile);
+  else
+    update_title();
   reset_exec();
 }
 
@@ -159,6 +163,7 @@ void IdeState::import_file(const char *filename)
     editor->buffer()->loadfile(filename);
     mark_dirty();
     openfile = filename;
+    update_title();
   }
 }
 
@@ -204,6 +209,18 @@ void IdeState::unhighlight_cell(unsigned cell)
   Fl_Group *cellGroup = packTape->child(cell)->as_group();
   Fl_Widget *cellMemb = cellGroup->child(2);
   cellMemb->box(FL_NO_BOX);
+}
+
+
+void IdeState::update_title()
+{
+  char buff[FL_PATH_MAX + 20];
+  strcpy(buff,"bfide - ");
+  if(openfile)
+    strncat(buff,fl_filename_name(openfile),FL_PATH_MAX);
+  else
+    strcat(buff,"untitled");
+  window->copy_label(buff);
 }
 
 

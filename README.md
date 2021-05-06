@@ -41,6 +41,7 @@ Runs, steps, and examines the state of a BF program.
 10. Input field: Program input is taken from here. Input is consumed as it is used; only used input gets written to the I/O console.
 11. Prompt: Determines execution behavior when the input field is blank, but the program needs more input. If User, focus goes to the input box, and execution stops until the user adds input. If Null, all inputs are nonblocking, and input commands when the input field is empty write the null character.
 12. Save: saves to a file and sets it as the current file. The save button is deactivated when the disk file is up to date.
+    * C file: If the chosen file is C source rather than bf, it is exported to, but the current file remains unchanged.
 13. Open: loads a file and sets it as the current file.
 
 The window title shows the name of the current file as well as an asterisk if it has been modified since the last save.

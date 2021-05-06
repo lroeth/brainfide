@@ -130,7 +130,7 @@ void IdeState::export_file(const char *filename)
   }
   else
   {
-    if(chooser->filter_value() == 1)
+    if(chooser && chooser->filter_value() == 1)
     {
       //cprog
     }

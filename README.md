@@ -23,28 +23,40 @@ The IDE additionally supports breakpoints, indicated by `$`, which stop executio
 
 Runs, steps, and examines the state of a BF program.
 
+#### UI
+
+##### Main window
+
 ![bfide UI](ui.png)
 
-1. BF program
-2. I/O console: input is prefixed with `>`. Errors, if any, will also appear here.
-3. Tape: right-infinite, each cell is mod-256.
-4. Execution pointer: the next command to be executed. Highlights the following newline if at EOF.
-5. Tape pointer: Shows the current cell of the tape.
-6. The ASCII representation of the value of the cell.
-7. The hexadecimal representation of the value of the cell.
-8. Run/continue.
-    * Forward: If at EOF, reset the program and begin running until EOF or a breakpoint. If already executing, but stopped, continue executing until EOF or a breakpoint.
-    * Reverse: Run backwards from current execution pointer until beginning of program or a breakpoint.
-9. Step. 
-    * Forward: If at EOF, reset the program. Otherwise, execute the next instruction.
-    * Backward: If at beginning of file, do nothing. Otherwise, step backwards one instruction.
-10. Input field: Program input is taken from here. Input is consumed as it is used; only used input gets written to the I/O console.
-11. Prompt: Determines execution behavior when the input field is blank, but the program needs more input. If User, focus goes to the input box, and execution stops until the user adds input. If Null, all inputs are nonblocking, and input commands when the input field is empty write the null character.
-12. Save: saves to a file and sets it as the current file. The save button is deactivated when the disk file is up to date.
-    * C file: If the chosen file is C source rather than bf, it is exported to, but the current file remains unchanged.
-13. Open: loads a file and sets it as the current file.
+1. Menu: see below
+2. BF program
+3. I/O console: input is prefixed with `>`. Errors, if any, will also appear here.
+4. Input field: Program input is taken from here. Input is consumed as it is used; only used input gets written to the I/O console.
+5. Tape: right-infinite, each cell is mod-256.
+6. Execution pointer: the next command to be executed. Highlights the following newline if at EOF.
+7. Tape pointer: Shows the current cell of the tape.
+8. The ASCII representation of the value of the cell.
+9. The hexadecimal representation of the value of the cell.
 
 The window title shows the name of the current file as well as an asterisk if it has been modified since the last save.
+
+##### Menu
+
+* File
+    * Save: saves to the current file. The save button is greyed out when the disk file is up to date.
+    * Save As: save to a file and set it as the current file.
+        * If the chosen file is C source rather than BF, it is exported to, but the current file remains unchanged.
+    * Open: loads a file and sets it as the current file.
+* Run
+    * Run: If at EOF, reset the program and begin running until EOF or a breakpoint. If already executing, but stopped, continue executing until EOF or a breakpoint.
+    * Run back: Run backwards from current execution pointer until beginning of program or a breakpoint.
+    * Step: If at EOF, reset the program. Otherwise, execute the next instruction.
+    * Step back: If at beginning of file, do nothing. Otherwise, step backwards one instruction.
+* Options
+    * Get more input: Determines execution behavior when the input field is blank, but the program needs more input.
+        * Prompt: focus goes to the input box, and execution stops until the user adds input.
+        * Null: all inputs are nonblocking, and input commands when the input field is empty receive the null character.
 
 #### Command line invocation
 

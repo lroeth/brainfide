@@ -1,2 +1,2 @@
-- switch to tiles for resizable proportions
+- move some bfide functionality to bfint
 - syntax highlighting

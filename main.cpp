@@ -2,6 +2,7 @@
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Scroll.H>
+#include <FL/Fl_Tile.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Menu_Item.H>
@@ -15,26 +16,28 @@
 #include "bfide.h"
 
 
-/* config macros */
+/* config macros: initial values */
 #define W_WINDOW 800
 #define H_WINDOW 600
-#define H_MENUBAR 30
-#define W_BUTTON 150
-#define H_BUTTON 30
 #define W_DISP 200
+
+/* config macros: fixed values */
+#define H_MENUBAR 30
+#define H_INPUT 30
 #define H_CELL_FIELD 20
 #define W_CELL 40
 #define MIN_W_EDITOR 200
+#define MIN_H_EDITOR 100
+#define MIN_W_DISP 100
+#define MIN_H_DISP 100
 
 /* convenience macros */
 #define H_CELL 3*H_CELL_FIELD
 #define H_TAPE (H_CELL + Fl::scrollbar_size())
 #define W_EDITOR W_WINDOW - W_DISP
 #define H_EDITOR H_WINDOW - H_TAPE - H_MENUBAR
-#define H_DISP H_EDITOR - H_BUTTON
-#define MIN_H_EDITOR MIN_W_EDITOR
-
-
+#define H_DISP H_EDITOR - H_INPUT
+#define MIN_H_TILE (MIN_H_EDITOR < MIN_H_DISP + H_INPUT ? MIN_H_DISP + H_INPUT : MIN_H_EDITOR)
 
 void run_fwd_cb(Fl_Widget *w, void *p)
 {
@@ -110,11 +113,14 @@ int main(int argc, char **argv)
   /* widget hierarchy */
   Fl_Double_Window *window = new Fl_Double_Window(W_WINDOW,H_WINDOW,"bfide");
     Fl_Menu_Bar *menu = new Fl_Menu_Bar(0,0,W_WINDOW,H_MENUBAR);
-    Fl_Text_Editor *editor = new Fl_Text_Editor(0,H_MENUBAR,W_EDITOR,H_EDITOR);
-    Fl_Group *groupIo = new Fl_Group(W_EDITOR,H_MENUBAR,W_DISP,H_EDITOR);
-      Fl_Text_Display *dispIo = new Fl_Text_Display(W_EDITOR,H_MENUBAR,W_DISP,H_DISP);
-      Fl_Input *inpIo = new Fl_Input(W_EDITOR,H_MENUBAR+H_DISP,W_DISP,H_BUTTON);
-    groupIo->end();
+    Fl_Tile *tile = new Fl_Tile(0,H_MENUBAR,W_WINDOW,H_EDITOR);
+      Fl_Box *boxTileResize = new Fl_Box(MIN_W_EDITOR,H_MENUBAR,W_WINDOW - (MIN_W_EDITOR + MIN_W_DISP), H_EDITOR);
+      Fl_Text_Editor *editor = new Fl_Text_Editor(0,H_MENUBAR,W_EDITOR,H_EDITOR);
+      Fl_Group *groupIo = new Fl_Group(W_EDITOR,H_MENUBAR,W_DISP,H_EDITOR);
+        Fl_Text_Display *dispIo = new Fl_Text_Display(W_EDITOR,H_MENUBAR,W_DISP,H_DISP);
+        Fl_Input *inpIo = new Fl_Input(W_EDITOR,H_MENUBAR+H_DISP,W_DISP,H_INPUT);
+      groupIo->end();
+    tile->end();
     Fl_Scroll *scrollTape = new Fl_Scroll(0,H_MENUBAR+H_EDITOR,W_WINDOW,H_TAPE);
       Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
       packTape->end();
@@ -125,8 +131,9 @@ int main(int argc, char **argv)
   packTape->type(Fl_Pack::HORIZONTAL);
   scrollTape->resizable(0);
   groupIo->resizable(dispIo);
-  window->resizable(editor);
-  window->size_range(MIN_W_EDITOR+W_DISP,H_MENUBAR + MIN_H_EDITOR + H_TAPE);
+  tile->resizable(boxTileResize);
+  window->resizable(tile);
+  window->size_range(MIN_W_EDITOR + MIN_W_DISP,H_MENUBAR + MIN_H_TILE + H_TAPE);
 
   /* setup data structures */
   Fl_Text_Buffer *buffProg = new Fl_Text_Buffer();

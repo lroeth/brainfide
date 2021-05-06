@@ -27,6 +27,8 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   isDirtyFile(true),
   isInput(false),
   isPrompt(true),
+  isRun(false),
+  isBlocking(false),
   lastStep(1),
   openfile(openfile)
 {
@@ -88,7 +90,7 @@ void IdeState::run_back()
 
 void IdeState::unblock()
 {
-  if(isBlocking==false)
+  if(!isBlocking)
     return;
   isBlocking=false;
   if(isRun)

@@ -14,7 +14,7 @@ CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field
 {}
 
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape, const char *openfile) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Button *buttonSave,const char *openfile) :
   config(h_cell_field,w_cell),
   window(window),
   editor(editor),
@@ -23,6 +23,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   scrollTape(scrollTape),
   packTape(packTape),
   chooser(0),
+  buttonSave(buttonSave),
   isDirty(false),
   isDirtyFile(true),
   isInput(false),
@@ -105,6 +106,7 @@ void IdeState::mark_dirty()
   isDirty=true;
   isDirtyFile=true;
   update_title();
+  buttonSave->activate();
 }
 
 
@@ -140,6 +142,7 @@ void IdeState::export_file(const char *filename)
       editor->buffer()->savefile(filename);
     openfile = filename;
     isDirtyFile = false;
+    buttonSave->deactivate();
     update_title();
   }
 }
@@ -170,9 +173,10 @@ void IdeState::import_file(const char *filename)
   else
   {
     editor->buffer()->loadfile(filename);
-    mark_dirty();
-    openfile = filename;
+    isDirty = true;
     isDirtyFile = false;
+    buttonSave->deactivate();
+    openfile = filename;
     update_title();
   }
 }

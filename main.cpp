@@ -128,9 +128,9 @@ int main(int argc, char **argv)
             Fl_Radio_Button *buttonPrompt = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"User");
             Fl_Radio_Button *buttonNull = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"Null");
           packPrompt->end();
-          Fl_Button *buttonImport = new Fl_Button(0,0,0,H_BUTTON,"Open");
           Fl_Button *buttonExportCurr = new Fl_Button(0,0,0,H_BUTTON,"Save");
           Fl_Button *buttonExport = new Fl_Button(0,0,0,H_BUTTON,"Save As");
+          Fl_Button *buttonImport = new Fl_Button(0,0,0,H_BUTTON,"Open");
         packButtons->end();
       packEditor->end();
       Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
   window->show(argc, argv);
 
   /* set up state object and callbacks */
-  IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,openfile);
+  IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,buttonExportCurr,openfile);
   buttonRun->callback(&run_fwd_cb, &state);
   buttonRevRun->callback(&run_back_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);

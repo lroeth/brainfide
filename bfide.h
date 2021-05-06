@@ -17,7 +17,7 @@ struct CellConfig
 class IdeState : public BFInt
 {
   public:
-    IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,const char *openfile);
+    IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Button *buttonSave,const char *openfile);
     ~IdeState();
     /* Execute/rewind one instruction */
     void step_fwd();
@@ -86,6 +86,7 @@ class IdeState : public BFInt
     Fl_Scroll *scrollTape;
     Fl_Pack *packTape;
     Fl_File_Chooser *chooser;
+    Fl_Button *buttonSave;
 
     /* State data */
     const struct CellConfig config; /* information needed to construct cells */

@@ -1,7 +1,5 @@
 - output c source
  - convert to c
-- input from file
- - add cl invocation
 - refactor bfint as base class without reverse functionality, and derived class
  - add backinput
  - add backouput

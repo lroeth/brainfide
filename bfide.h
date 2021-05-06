@@ -5,7 +5,7 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Pack.H>
 #include <FL/Fl_Input.H>
-#include "bfint.h"
+#include "bfintbidir.h"
 
 struct CellConfig
 {
@@ -14,7 +14,7 @@ struct CellConfig
   CellConfig(int h_cell_field, int w_cell);
 };
 
-class IdeState : public BFInt
+class IdeState : public BFIntBidir
 {
   public:
     IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Button *buttonSave,const char *openfile);

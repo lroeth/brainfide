@@ -148,14 +148,32 @@ int main(int argc, char **argv)
   window->resizable(packWindow);
   window->size_range(MIN_W_EDITOR+W_BUTTON,packButtons->children()*H_BUTTON + H_DISP + H_TAPE);
 
-  /* setup data structures and callbacks */
+  /* setup data structures */
   Fl_Text_Buffer *buffProg = new Fl_Text_Buffer();
   editor->buffer(buffProg);
   editor->textfont(FL_COURIER);
   Fl_Text_Buffer *buffIo = new Fl_Text_Buffer();
   dispIo->buffer(buffIo);
   dispIo->textfont(FL_COURIER);
-  IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape);
+
+  /* load commandline scripts or stdin, if any */
+  char *openfile = 0;
+  int i;
+  int arg = Fl::args(argc,argv,i);
+  if(arg && arg < argc)
+  {
+    if(argv[i][0]=='-')
+    {
+      char buff[1024];
+      while(fgets(buff,1024,stdin))
+        buffProg->append(buff);
+    }
+    else
+      openfile = argv[i];
+  }
+
+  /* set up state object and callbacks */
+  IdeState state(H_CELL_FIELD,W_CELL,editor,dispIo,inpIo,scrollTape,packTape,openfile);
   buttonRun->callback(&run_fwd_cb, &state);
   buttonRevRun->callback(&run_back_cb, &state);
   buttonForward->callback(&step_fwd_cb, &state);

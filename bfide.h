@@ -17,7 +17,7 @@ struct CellConfig
 class IdeState : public BFInt
 {
   public:
-    IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape);
+    IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,const char *openfile);
     ~IdeState();
     /* Execute/rewind one instruction */
     void step_fwd();
@@ -89,4 +89,5 @@ class IdeState : public BFInt
     bool isRun; /* before blocking for input, program was run, not stepped */
     bool isBlocking; /* currently blocking for input; ignore most callbacks */
     int lastStep; /* return status of last call to step() */
+    const char *openfile; /* current file, or null for untitled */
 };

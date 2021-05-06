@@ -13,7 +13,7 @@ CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field
 {}
 
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape, const char *openfile) :
   config(h_cell_field,w_cell),
   editor(editor),
   dispIo(dispIo),
@@ -24,8 +24,11 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Text_Editor *editor, Fl_Text
   isDirty(false),
   isInput(false),
   isPrompt(true),
-  lastStep(1)
+  lastStep(1),
+  openfile(openfile)
 {
+  if(openfile)
+    import_file(openfile);
   reset_exec();
 }
 
@@ -103,17 +106,29 @@ void IdeState::export_file(const char *filename)
   if(!filename)
   {
     if(!chooser)
+    {
       chooser = new Fl_File_Chooser(0,"BF source (*.bf)\tC source (*.c)\tAll Files (*)",Fl_File_Chooser::CREATE,"Save as");
+      chooser->callback(&chooser_cb, this);
+    }
     else
     {
       chooser->type(Fl_File_Chooser::CREATE);
       chooser->label("Save as");
+      chooser->value(openfile);
+      chooser->filter("BF source (*.bf)\tC source (*.c)\tAll Files (*)");
     }
-    chooser->callback(&chooser_cb, this);
     chooser->show();
   }
   else
-    editor->buffer()->savefile(filename);
+  {
+    if(chooser->filter_value() == 1)
+    {
+      //cprog
+    }
+    else
+      editor->buffer()->savefile(filename);
+    openfile = filename;
+  }
 }
 
 
@@ -122,17 +137,25 @@ void IdeState::import_file(const char *filename)
   if(!filename)
   {
     if(!chooser)
-      chooser = new Fl_File_Chooser(0,"BF Source (*.bf)\tAll Files (*)",Fl_File_Chooser::SINGLE,"Open");
+    {
+      chooser = new Fl_File_Chooser(openfile,"BF Source (*.bf)\tAll Files (*)",Fl_File_Chooser::SINGLE,"Open");
+      chooser->callback(&chooser_cb, this);
+    }
     else
     {
       chooser->type(Fl_File_Chooser::SINGLE);
       chooser->label("Open");
+      chooser->value(openfile);
+      chooser->filter("BF Source (*.bf)\tAll Files (*)");
     }
-    chooser->callback(&chooser_cb, this);
     chooser->show();
   }
   else
+  {
     editor->buffer()->loadfile(filename);
+    mark_dirty();
+    openfile = filename;
+  }
 }
 
 

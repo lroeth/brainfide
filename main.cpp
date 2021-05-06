@@ -126,7 +126,7 @@ int main(int argc, char **argv)
   scrollTape->resizable(0);
   groupIo->resizable(dispIo);
   window->resizable(editor);
-  window->size_range(MIN_W_EDITOR+W_DISP,MIN_H_EDITOR + H_TAPE);
+  window->size_range(MIN_W_EDITOR+W_DISP,H_MENUBAR + MIN_H_EDITOR + H_TAPE);
 
   /* setup data structures */
   Fl_Text_Buffer *buffProg = new Fl_Text_Buffer();

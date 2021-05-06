@@ -112,7 +112,11 @@ void IdeState::mark_dirty()
 
 
 void IdeState::prompt(bool isPrompt)
-  {this->isPrompt=isPrompt;}
+{
+  this->isPrompt=isPrompt;
+  if(!isPrompt)
+    unblock();
+}
 
 
 void IdeState::export_file(const char *filename)

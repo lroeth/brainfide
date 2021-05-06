@@ -24,6 +24,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   packTape(packTape),
   chooser(0),
   isDirty(false),
+  isDirtyFile(true),
   isInput(false),
   isPrompt(true),
   lastStep(1),
@@ -98,7 +99,11 @@ void IdeState::unblock()
 
 
 void IdeState::mark_dirty()
-  {isDirty=true;}
+{
+  isDirty=true;
+  isDirtyFile=true;
+  update_title();
+}
 
 
 void IdeState::prompt(bool isPrompt)
@@ -132,6 +137,8 @@ void IdeState::export_file(const char *filename)
     else
       editor->buffer()->savefile(filename);
     openfile = filename;
+    isDirtyFile = false;
+    update_title();
   }
 }
 
@@ -163,6 +170,7 @@ void IdeState::import_file(const char *filename)
     editor->buffer()->loadfile(filename);
     mark_dirty();
     openfile = filename;
+    isDirtyFile = false;
     update_title();
   }
 }
@@ -216,6 +224,8 @@ void IdeState::update_title()
 {
   char buff[FL_PATH_MAX + 20];
   strcpy(buff,"bfide - ");
+  if(isDirtyFile)
+    strcat(buff,"*");
   if(openfile)
     strncat(buff,fl_filename_name(openfile),FL_PATH_MAX);
   else

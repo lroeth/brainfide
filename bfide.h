@@ -90,6 +90,7 @@ class IdeState : public BFInt
     /* State data */
     const struct CellConfig config; /* information needed to construct cells */
     bool isDirty; /* program has been edited since last parse */
+    bool isDirtyFile; /* program has been edited since last save */
     bool isInput; /* output is ready for input */
     bool isPrompt; /* if input runs out, prompt user. if false, just feed nulls */
     bool isRun; /* before blocking for input, program was run, not stepped */

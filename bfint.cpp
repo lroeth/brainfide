@@ -137,7 +137,7 @@ std::string BFInt::export_c(std::string program)
       case '[': out+="while(*t!=0){\n"; break;
     }
   }
-  out+="return 0;}\n";
+  out+="free(tape);\nreturn 0;}\n";
   return out;
 }
 

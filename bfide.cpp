@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <FL/Fl.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Group.H>
@@ -134,16 +135,22 @@ void IdeState::export_file(const char *filename)
   }
   else
   {
-    if(chooser && chooser->filter_value() == 1)
+    if(strcmp(openfile,filename) && chooser && chooser->filter_value() == 1)
     {
-      //cprog
+      FILE *cFile = fl_fopen(filename,"w");
+      char *buff = editor->buffer()->text();
+      fputs(BFInt::export_c(buff).c_str(),cFile);
+      free(buff);
+      fclose(cFile);
     }
     else
+    {
       editor->buffer()->savefile(filename);
-    openfile = filename;
-    isDirtyFile = false;
-    buttonSave->deactivate();
-    update_title();
+      openfile = filename;
+      isDirtyFile = false;
+      buttonSave->deactivate();
+      update_title();
+    }
   }
 }
 

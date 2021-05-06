@@ -8,9 +8,6 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Radio_Button.H>
-#include <FL/Fl_Repeat_Button.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Input.H>
@@ -112,32 +109,23 @@ int main(int argc, char **argv)
 {
   /* widget hierarchy */
   Fl_Double_Window *window = new Fl_Double_Window(W_WINDOW,H_WINDOW,"bfide");
-    Fl_Pack *packWindow = new Fl_Pack(0,0,W_WINDOW,H_WINDOW);
-      Fl_Menu_Bar *menu = new Fl_Menu_Bar(0,0,0,H_MENUBAR);
-      Fl_Pack *packEditor = new Fl_Pack(0,0,W_WINDOW,H_EDITOR);
-        Fl_Text_Editor *editor = new Fl_Text_Editor(0,0,W_EDITOR,0);
-        Fl_Pack *packIo = new Fl_Pack(0,0,W_DISP,0);
-          Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
-          Fl_Input *inpIo = new Fl_Input(0,0,0,H_BUTTON);
-        packIo->end();
-      packEditor->end();
-      Fl_Scroll *scrollTape = new Fl_Scroll(0,0,W_WINDOW,H_TAPE);
-        Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
-        packTape->end();
-      scrollTape->end();
-    packWindow->end();
+    Fl_Menu_Bar *menu = new Fl_Menu_Bar(0,0,W_WINDOW,H_MENUBAR);
+    Fl_Text_Editor *editor = new Fl_Text_Editor(0,H_MENUBAR,W_EDITOR,H_EDITOR);
+    Fl_Group *groupIo = new Fl_Group(W_EDITOR,H_MENUBAR,W_DISP,H_EDITOR);
+      Fl_Text_Display *dispIo = new Fl_Text_Display(W_EDITOR,H_MENUBAR,W_DISP,H_DISP);
+      Fl_Input *inpIo = new Fl_Input(W_EDITOR,H_MENUBAR+H_DISP,W_DISP,H_BUTTON);
+    groupIo->end();
+    Fl_Scroll *scrollTape = new Fl_Scroll(0,H_MENUBAR+H_EDITOR,W_WINDOW,H_TAPE);
+      Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
+      packTape->end();
+    scrollTape->end();
   window->end();
 
   /* configure widgets and resize behaviour */
-  packIo->type(Fl_Pack::VERTICAL);
-  packEditor->type(Fl_Pack::HORIZONTAL);
   packTape->type(Fl_Pack::HORIZONTAL);
-  packWindow->type(Fl_Pack::VERTICAL);
   scrollTape->resizable(0);
-  packIo->resizable(0);
-  packEditor->resizable(editor);
-  packWindow->resizable(packEditor);
-  window->resizable(packWindow);
+  groupIo->resizable(dispIo);
+  window->resizable(editor);
   window->size_range(MIN_W_EDITOR+W_DISP,MIN_H_EDITOR + H_TAPE);
 
   /* setup data structures */

@@ -5,6 +5,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Box.H>
 #include <FL/filename.H>
+#include <FL/Fl_Menu_Item.H>
 #include "bfide.h"
 
 
@@ -14,8 +15,7 @@
 CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field),w_cell(w_cell)
 {}
 
-
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Widget *widgetSave,const char *openfile) :
+IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Menu_Item *menuSave,const char *openfile) :
   config(h_cell_field,w_cell),
   window(window),
   editor(editor),
@@ -24,7 +24,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   scrollTape(scrollTape),
   packTape(packTape),
   chooser(0),
-  widgetSave(widgetSave),
+  menuSave(menuSave),
   isDirty(false),
   isDirtyFile(true),
   isInput(false),
@@ -107,7 +107,7 @@ void IdeState::mark_dirty()
   isDirty=true;
   isDirtyFile=true;
   update_title();
-  widgetSave->activate();
+  menuSave->activate();
 }
 
 
@@ -148,7 +148,7 @@ void IdeState::export_file(const char *filename)
       editor->buffer()->savefile(filename);
       openfile = filename;
       isDirtyFile = false;
-      widgetSave->deactivate();
+      menuSave->deactivate();
       update_title();
     }
   }
@@ -182,7 +182,7 @@ void IdeState::import_file(const char *filename)
     editor->buffer()->loadfile(filename);
     isDirty = true;
     isDirtyFile = false;
-    widgetSave->deactivate();
+    menuSave->deactivate();
     openfile = filename;
     update_title();
   }

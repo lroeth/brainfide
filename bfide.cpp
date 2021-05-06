@@ -132,6 +132,10 @@ void IdeState::export_file(const char *filename)
 }
 
 
+void IdeState::export_curr()
+  {export_file(openfile);}
+
+
 void IdeState::import_file(const char *filename)
 {
   if(!filename)

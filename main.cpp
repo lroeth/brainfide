@@ -98,6 +98,12 @@ void import_cb(Fl_Widget *w, void *p)
   state->import_file();
 }
 
+void export_curr_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = (IdeState*) p;
+  state->export_curr();
+}
+
 
 
 int main(int argc, char **argv)
@@ -123,7 +129,8 @@ int main(int argc, char **argv)
             Fl_Radio_Button *buttonNull = new Fl_Radio_Button(0,0,W_BUTTON/2,0,"Null");
           packPrompt->end();
           Fl_Button *buttonImport = new Fl_Button(0,0,0,H_BUTTON,"Open");
-          Fl_Button *buttonExport = new Fl_Button(0,0,0,H_BUTTON,"Save");
+          Fl_Button *buttonExportCurr = new Fl_Button(0,0,0,H_BUTTON,"Save");
+          Fl_Button *buttonExport = new Fl_Button(0,0,0,H_BUTTON,"Save As");
         packButtons->end();
       packEditor->end();
       Fl_Text_Display *dispIo = new Fl_Text_Display(0,0,0,H_DISP);
@@ -182,6 +189,7 @@ int main(int argc, char **argv)
   buttonPrompt->setonly();
   buttonNull->callback(&null_cb, &state);
   buttonExport->callback(&export_cb,&state);
+  buttonExportCurr->callback(&export_curr_cb, &state);
   buttonImport->callback(&import_cb,&state);
   buffProg->add_modify_callback(&edited_cb, &state);
   inpIo->callback(&inp_edited_cb, &state);

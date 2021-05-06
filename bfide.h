@@ -36,8 +36,11 @@ class IdeState : public BFInt
     void prompt(bool isPrompt);
     /* Export / import script to/from file
     *  If filename is null, run file picker to get file
+    *  Export_curr overwrites currently open filename automatically,
+    *    or calls file picker if no currently open file.
     */
     void export_file(const char *filename=0);
+    void export_curr();
     void import_file(const char *filename=0);
 
   private:

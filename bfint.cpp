@@ -107,7 +107,7 @@ bool BFInt::backstep()
   return true;
 }
 
-std::string BFInt::export_c()
+std::string BFInt::export_c(std::string program)
 {
   std::string out = "#include<stdio.h>\n"
                     "#include<stdlib.h>\n"

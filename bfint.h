@@ -12,7 +12,8 @@ class BFInt
     void reset_exec();
     int step(); /* returns -1 for error stop, 1 for eof, 2 for input not ready, positive for d_handle status, 0 for continue */
     bool backstep(); /* returns false if not at beginning of file or d_backhandle returned false */
-    std::string export_c();
+
+    static std::string export_c(std::string program);
 
   protected:
     /* mostly internal functions

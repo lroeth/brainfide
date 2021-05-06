@@ -1,5 +1,5 @@
 #include "clint.h"
-#include <string.h>
+#include <iostream>
 #include <fstream>
 
 unsigned char CLInt::input()

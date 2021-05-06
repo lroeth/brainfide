@@ -1,4 +1,3 @@
-#include <iostream>
 #include "bfint.h"
 
 class CLInt : public BFInt

@@ -11,14 +11,18 @@ class BFIntBidir : public BFInt
     bool backstep(); /* returns false if not at beginning of file or d_backhandle returned false */
 
   protected:
-    /* reversible version of write_cell, and corresponding inverse */
+    /* invertible version of write_cell(), and corresponding inverse */
     void write_cell_inp(unsigned char val);
     void unwrite_cell_inp();
 
-    /* inverse of d_handle */
+    /* inverse of input() and output() */
+    virtual void backinput()=0;
+    virtual void backoutput()=0;
+
+    /* inverse of d_handle() */
     virtual bool d_backhandle() {return true;} /* return true to not stop */
 
-    /* convenience for making step() and backstep() reversible */
+    /* convenience for making step() and backstep() invertible */
     void backstep_loop(unsigned left, unsigned right);
     bool step_loop(unsigned left, unsigned right, bool isLeft);
 

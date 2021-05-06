@@ -54,8 +54,8 @@ bool BFIntBidir::backstep()
     case '>': write_tape_pos(tapePos - 1); break;
     case '+': write_cell(tape[tapePos]-1); break;
     case '-': write_cell(tape[tapePos]+1); break;
-    case ',': unwrite_cell_inp();          break;
-    case '.': break;
+    case ',': unwrite_cell_inp(); backinput(); break;
+    case '.': backoutput(); break;
     case ']': backstep_loop(loops[progPos],progPos); break;
     case '[': backstep_loop(progPos,loops[progPos]); break;
     default : return d_backhandle();

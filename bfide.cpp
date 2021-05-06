@@ -271,6 +271,13 @@ unsigned char IdeState::input()
   return buff[0];  
 }
 
+void IdeState::backinput()
+{
+  int toDelete = isInput ? 1 : 2;
+  isInput=true;
+  int end = dispIo->buffer()->length();
+  dispIo->buffer()->remove(end - toDelete, end);
+}
 
 bool IdeState::input_ready()
 {
@@ -278,7 +285,6 @@ bool IdeState::input_ready()
     return true;
   return (inpIo->size() > 0);
 }
-
 
 void IdeState::output(unsigned char out)
 {
@@ -291,6 +297,13 @@ void IdeState::output(unsigned char out)
   isInput=false;
 }
 
+void IdeState::backoutput()
+{
+  int toDelete = isInput ? 3 : 1;
+  isInput=false;
+  int end = dispIo->buffer()->length();
+  dispIo->buffer()->remove(end - toDelete, end);
+}
 
 void IdeState::err_output(std::string message, bool is_warning)
 {

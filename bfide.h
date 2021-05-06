@@ -62,8 +62,10 @@ class IdeState : public BFIntBidir
 
     /* I/O virtual functions from bfint */
     unsigned char input();
+    void backinput();
     bool input_ready();
     void output(unsigned char out);
+    void backoutput();
     void err_output(std::string message, bool is_warning);
 
     /* UI update virtual functions from bfint*/

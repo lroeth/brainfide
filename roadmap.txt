@@ -1,6 +1,3 @@
-- refactor bfint as base class without reverse functionality, and derived class
- - add backinput
- - add backouput
 - make menu instead of side buttons
 - switch to tiles for resizable proportions
 - syntax highlighting

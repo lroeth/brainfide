@@ -107,6 +107,43 @@ bool BFInt::backstep()
   return true;
 }
 
+std::string BFInt::export_c()
+{
+  std::string out = "#include<stdio.h>\n"
+                    "#include<stdlib.h>\n"
+                    "int main(){\n"
+                      "unsigned size = 1024;\n"
+                      "unsigned init = 1024;\n"
+                      "unsigned char *tape = calloc(size,1);\n"
+                      "unsigned char *t=tape;\n"
+                      "int b;\n";
+  for(int i=0;i<program.size();i++)
+  {
+    switch(program[i])
+    {
+      case '<': out+="if(t-- == tape) return 1;"; break;
+      case '>': out+="if(++t-tape == size){\n"
+                       "tape = realloc(tape,size*2);\n"
+                       "t = tape + size;\n"
+                       "size *= 2;}\n"
+                     "if(t-tape == init){\n"
+                       "*t=0;\n"
+                       "init++;}\n"; break;
+      case '+': out+="++*t;\n"; break;
+      case '-': out+="--*t;\n"; break;
+      case ',': out+="b=fgetc(stdin);*t=b==(-1)?'\\0':b;\n"; break;
+      case '.': out+="putchar(*t);\n"; break;
+      case ']': out+="}\n"; break;
+      case '[': out+="while(*t!=0){\n"; break;
+    }
+  }
+  out+="return 0;}\n";
+  return out;
+}
+
+
+
+
 unsigned BFInt::get_prog_pos()
   {return progPos;}
 

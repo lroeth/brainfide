@@ -276,7 +276,17 @@ void IdeState::backinput()
   int toDelete = isInput ? 1 : 2;
   isInput=true;
   int end = dispIo->buffer()->length();
-  dispIo->buffer()->remove(end - toDelete, end);
+  char cell = get_cell(get_tape_pos());
+  if(cell)
+  {
+    inpIo->position(0);
+    inpIo->insert(&cell, 1);
+    inpIo->position(inpIo->size());
+    dispIo->buffer()->remove(end - toDelete, end);
+  }
+  else
+    dispIo->buffer()->remove(end - toDelete - 1, end);
+
 }
 
 bool IdeState::input_ready()

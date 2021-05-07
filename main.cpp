@@ -120,7 +120,7 @@ void save_as_cb(Fl_Widget *w, void *p)
   state->save_as();  
 }
 
-void window_cb(Fl_Widget *w, void *p)
+void close_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = *((IdeState**) p);
   state->close();
@@ -187,6 +187,7 @@ int main(int argc, char **argv)
         {"&Open",          (FL_CTRL+'o'), open_cb,      &statep},
         {"&Save",          (FL_CTRL+'s'), save_cb,      &statep},
         {"Save &as",       (FL_CTRL+'S'), save_as_cb,   &statep},
+        {"&Close",         (FL_CTRL+'w'), close_cb,     &statep},
       {0},
       {"&Run",             0,             0,            0,        FL_SUBMENU},
         {"Res&tart",       (FL_F+5),      reset_cb,     &statep,  FL_MENU_DIVIDER},
@@ -208,7 +209,7 @@ int main(int argc, char **argv)
   buffProg->add_modify_callback(&edited_cb, &statep);
   inpIo->callback(&inp_edited_cb, &statep);
   inpIo->when(FL_WHEN_CHANGED);
-  window->callback(window_cb, &statep);
+  window->callback(close_cb, &statep);
 
   return Fl::run();
 }

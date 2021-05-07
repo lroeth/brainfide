@@ -35,7 +35,6 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
     open(openfile);
   else
     update_title();
-  menuSave->deactivate();
   reset_exec();
 }
 
@@ -165,7 +164,7 @@ void IdeState::update_title()
 void IdeState::mark_dirty_file(bool isDirty)
 {
   isDirtyFile = isDirty;
-  if(isDirtyFile)
+  if(!openfile || isDirtyFile)
     menuSave->activate();
   else
     menuSave->deactivate();

@@ -16,6 +16,7 @@ void BFInt::reset_exec()
   tape.assign(1,0);
   write_tape_pos(0);
   write_prog_pos(0);
+  isBlocking = false;
   d_reset_exec();
 }
 

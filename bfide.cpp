@@ -140,9 +140,10 @@ bool IdeState::overwrite()
   switch(fl_choice("You have unsaved changes to %s. Are you sure?",
                    "Cancel","Continue","Save",openfile ? openfile : "untitled"))
     {
-      case 2: save();
-      case 1: return false;
       case 0: return true;
+      case 2: save();
+      case 1:
+      default: return false;
     }
 }
 

@@ -8,6 +8,26 @@ void BFIntBidir::reset_exec()
   BFInt::reset_exec();
 }
 
+bool BFIntBidir::step_back()
+{
+  isBlocking=false;
+  int status;
+  if(!(status=clean()))
+    backstep();
+  return status>=0;
+}
+
+bool BFIntBidir::run_back()
+{
+  isBlocking=false;
+  int status;
+  if(!(status=clean()))
+    while(backstep());
+  return status>=0;
+}
+
+
+
 int BFIntBidir::step()
 {
   if(progPos >= program.size())
@@ -27,7 +47,10 @@ int BFIntBidir::step()
     case '+': write_cell(tape[tapePos]+1); break;
     case '-': write_cell(tape[tapePos]-1); break;
     case ',': if(!input_ready())
+              {
+                block();
                 return 2;
+              }
               write_cell_inp(input()); break;
     case '.': output(tape[tapePos]); break;
     case ']': if(step_loop(loops[progPos],progPos,false)) return 0; break;

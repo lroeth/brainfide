@@ -16,7 +16,6 @@ CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field
 {}
 
 IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Menu_Item *menuSave,const char *openfile) :
-  config(h_cell_field,w_cell),
   window(window),
   editor(editor),
   dispIo(dispIo),
@@ -25,13 +24,10 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   packTape(packTape),
   chooser(0),
   menuSave(menuSave),
-  isDirty(false),
+  config(h_cell_field,w_cell),
   isDirtyFile(true),
   isInput(false),
   isPrompt(true),
-  isRun(false),
-  isBlocking(false),
-  lastStep(1),
   openfile(openfile)
 {
   if(openfile)
@@ -48,63 +44,9 @@ IdeState::~IdeState()
 }
 
 
-void IdeState::step_fwd()
-{
-  if(clean())
-    return;
-  isRun=false;
-  lastStep = step();
-  if(lastStep == 1 || lastStep < 0)
-    reset_exec();
-  else if(lastStep == 2)
-    block();
-}
-
-
-void IdeState::step_back()
-{
-  isBlocking=false;
-  if(!clean())
-    backstep();
-}
-
-
-void IdeState::run_fwd()
-{
-  if(clean()<0)
-    return;
-  if(lastStep == 1 || lastStep<0)
-    reset_exec();
-  isRun=true;
-  while(!(lastStep = step()));
-  if(lastStep == 2)
-    block();
-}
-
-
-void IdeState::run_back()
-{
-  isBlocking=false;
-  if(!clean())
-    while(backstep());
-}
-
-
-void IdeState::unblock()
-{
-  if(!isBlocking)
-    return;
-  isBlocking=false;
-  if(isRun)
-    run_fwd();
-  else
-    step_fwd();
-}
-
-
 void IdeState::mark_dirty()
 {
-  isDirty=true;
+  BFInt::mark_dirty();
   isDirtyFile=true;
   update_title();
   menuSave->activate();
@@ -184,7 +126,7 @@ void IdeState::import_file(const char *filename)
   else
   {
     editor->buffer()->loadfile(filename);
-    isDirty = true;
+    BFInt::mark_dirty();
     isDirtyFile = false;
     menuSave->deactivate();
     openfile = filename;
@@ -196,25 +138,7 @@ void IdeState::import_file(const char *filename)
 /* Private ********************************************************************/
 
 
-void IdeState::block()
-{
-  isBlocking = true;
-  inpIo->take_focus();
-}
 
-
-int IdeState::clean()
-{
-  if(!isDirty)
-    return 0;
-  char *buff = editor->buffer()->text();
-  if(!update_program(buff))
-    return -1;
-  free(buff);
-  reset_exec();
-  isDirty = false;
-  return 1;
-}
 
 
 void IdeState::highlight_cell(unsigned cell)
@@ -326,7 +250,12 @@ void IdeState::err_output(std::string message, bool is_warning)
     dispIo->buffer()->append(("\nERROR: "+message).c_str());
 }
 
+std::string IdeState::new_program()
+  {return std::string(editor->buffer()->text());}
 
+
+void IdeState::d_block()
+  {inpIo->take_focus();}
 
 
 int IdeState::d_handle()
@@ -391,15 +320,15 @@ void IdeState::d_write_prog_pos(unsigned oldPos)
   {editor->buffer()->highlight(get_prog_pos(),get_prog_pos()+1);}
 
 
-void IdeState::d_clear_tape()
+void IdeState::d_reset_exec()
 {
   /* clears dispIo: for history, change to insert some newlines */
   dispIo->buffer()->text(0);
+  inpIo->value(0);
   isInput=false;
   packTape->clear();
   d_add_cell();
   highlight_cell(0);
-  lastStep=0;
 }
 
 

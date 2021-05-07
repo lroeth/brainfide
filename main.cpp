@@ -63,6 +63,12 @@ void step_back_cb(Fl_Widget *w, void *p)
   state->step_back();
 }
 
+void reset_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState **) p);
+  state->reset_exec();
+}
+
 void prompt_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = *((IdeState**) p);
@@ -164,21 +170,22 @@ int main(int argc, char **argv)
   IdeState *statep = 0;
   Fl_Menu_Item menuItems[] =
     {
-      {"&File",            0, 0,            0, FL_SUBMENU},
+      {"&File",            0,             0,            0,        FL_SUBMENU},
         {"&Open",          (FL_CTRL+'o'), open_cb,      &statep},
         {"&Save",          (FL_CTRL+'s'), save_cb,      &statep},
         {"Save &as",       (FL_CTRL+'S'), save_as_cb,   &statep},
       {0},
-      {"&Run",             0, 0,            0, FL_SUBMENU},
-        {"&Run",           (FL_F+4), run_fwd_cb,   &statep},
-        {"Run back",       (FL_F+1), run_back_cb,  &statep, FL_MENU_DIVIDER},
-        {"&Step",          (FL_F+3), step_fwd_cb,  &statep},
-        {"Step &back",     (FL_F+2), step_back_cb, &statep},
+      {"&Run",             0,             0,            0,        FL_SUBMENU},
+        {"Res&tart",       (FL_F+5),      reset_cb,     &statep,  FL_MENU_DIVIDER},
+        {"&Run",           (FL_F+4),      run_fwd_cb,   &statep},
+        {"&Step",          (FL_F+3),      step_fwd_cb,  &statep,  FL_MENU_DIVIDER},
+        {"Step &back",     (FL_F+2),      step_back_cb, &statep},
+        {"Run back",       (FL_F+1),      run_back_cb,  &statep},
       {0},
-      {"&Options",         0, 0,            0, FL_SUBMENU},
-        {"Get more input", 0, 0,            0, FL_SUBMENU},
-          {"&Prompt user", (FL_CTRL+'p'), prompt_cb,    &statep, FL_MENU_RADIO|FL_MENU_VALUE},
-          {"&Always null", (FL_CTRL+'n'), null_cb,      &statep, FL_MENU_RADIO},
+      {"&Options",         0,             0,            0,        FL_SUBMENU},
+        {"Get more input", 0,             0,            0,        FL_SUBMENU},
+          {"&Prompt user", (FL_CTRL+'p'), prompt_cb,    &statep,  FL_MENU_RADIO|FL_MENU_VALUE},
+          {"&Always null", (FL_CTRL+'n'), null_cb,      &statep,  FL_MENU_RADIO},
         {0},
       {0},
     {0}};

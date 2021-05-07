@@ -49,10 +49,11 @@ The window title shows the name of the current file as well as an asterisk if it
         * If the chosen file is C source rather than BF, it is exported to, but the current file remains unchanged.
     * Open: loads a file and sets it as the current file.
 * Run
-    * Run: If at EOF, reset the program and begin running until EOF or a breakpoint. If already executing, but stopped, continue executing until EOF or a breakpoint.
+    * Reset: Reset to beginning of program, clearing tape and I/O.
+    * Run: Begin/continue running until EOF or a breakpoint.
+    * Step: Run the next instruction.
+    * Step back: If at beginning of file, do nothing. Otherwise, run backwards one instruction.
     * Run back: Run backwards from current execution pointer until beginning of program or a breakpoint.
-    * Step: If at EOF, reset the program. Otherwise, execute the next instruction.
-    * Step back: If at beginning of file, do nothing. Otherwise, step backwards one instruction.
 * Options
     * Get more input: Determines execution behavior when the input field is blank, but the program needs more input.
         * Prompt: focus goes to the input box, and execution stops until the user adds input.

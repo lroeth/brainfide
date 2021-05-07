@@ -4,13 +4,16 @@
 class BFIntBidir : public BFInt
 {
   public:
-    /* overrides to record needed information */
+    /* override to record needed information */
     void reset_exec();
+
+    bool step_back(); /* reverse execute 1 instruction or do nothing at beginning of program, return true unless clean fails */
+    bool run_back(); /* reverse execute until d_backhandle stop or beginning of program, return true unless clean fails */
+
+  protected:
     int step();
     /* inverse of step */
     bool backstep(); /* returns false if not at beginning of file or d_backhandle returned false */
-
-  protected:
     /* invertible version of write_cell(), and corresponding inverse */
     void write_cell_inp(unsigned char val);
     void unwrite_cell_inp();

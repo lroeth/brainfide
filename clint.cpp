@@ -2,6 +2,9 @@
 #include <iostream>
 #include <fstream>
 
+CLInt::CLInt(std::string *program) : program(program)
+  {mark_dirty();}
+
 unsigned char CLInt::input()
 {
   char in = std::cin.get();
@@ -18,6 +21,9 @@ void CLInt::output(unsigned char out)
 
 void CLInt::err_output(std::string message, bool is_warning)
   {std::cerr<<(is_warning?"WARNING: ":"ERROR: ")<<message<<std::endl;}
+
+std::string CLInt::new_program()
+  {return *program;}
 
 int CLInt::d_handle()
   {return 0;/* ignore non command characters */}
@@ -37,13 +43,8 @@ int main(int argc, char **argv)
     program+=curr;
     program+='\n';
   }
-  CLInt state;
-  if(!state.update_program(program))
+  CLInt state(&program);
+  if(!state.run_fwd())
     return 2;
-  int status;
-  while((status = state.step())==0);
-  if(status < 0)
-    return 2;
-  else
-    return 0;
+  return 0;
 }

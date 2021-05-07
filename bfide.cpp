@@ -1,382 +1,215 @@
-#include <stdio.h>
-#include <string.h>
 #include <FL/Fl.H>
-#include <FL/Fl_Output.H>
+#include <FL/Fl_Pack.H>
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Box.H>
-#include <FL/filename.H>
-#include <FL/fl_ask.H>
+#include <FL/Fl_Scroll.H>
+#include <FL/Fl_Tile.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Menu_Item.H>
-#include "bfide.h"
+#include <FL/Fl_Text_Editor.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Box.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_File_Chooser.H>
+#include "idestate.h"
 
 
-/* Public *********************************************************************/
+/* config macros: initial values */
+#define W_WINDOW 800
+#define H_WINDOW 600
+#define W_DISP 200
 
+/* config macros: fixed values */
+#define H_MENUBAR 30
+#define H_INPUT 30
+#define H_CELL_FIELD 20
+#define W_CELL 40
+#define MIN_W_EDITOR 200
+#define MIN_H_EDITOR 100
+#define MIN_W_DISP 100
+#define MIN_H_DISP 100
 
-CellConfig::CellConfig(int h_cell_field, int w_cell) : h_cell_field(h_cell_field),w_cell(w_cell)
-{}
+/* convenience macros */
+#define H_CELL 3*H_CELL_FIELD
+#define H_TAPE (H_CELL + Fl::scrollbar_size())
+#define W_EDITOR W_WINDOW - W_DISP
+#define H_EDITOR H_WINDOW - H_TAPE - H_MENUBAR
+#define H_DISP H_EDITOR - H_INPUT
+#define MIN_H_TILE (MIN_H_EDITOR < MIN_H_DISP + H_INPUT ? MIN_H_DISP + H_INPUT : MIN_H_EDITOR)
 
-IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Editor *editor, Fl_Text_Display *dispIo, Fl_Input *inpIo, Fl_Scroll *scrollTape,Fl_Pack *packTape,Fl_Menu_Item *menuSave,const char *openfile) :
-  window(window),
-  editor(editor),
-  dispIo(dispIo),
-  inpIo(inpIo),
-  scrollTape(scrollTape),
-  packTape(packTape),
-  chooser(0),
-  menuSave(menuSave),
-  config(h_cell_field,w_cell),
-  isDirtyFile(false),
-  isInput(false),
-  isPrompt(true),
-  openfile(openfile)
+void run_fwd_cb(Fl_Widget *w, void *p)
 {
-  if(openfile)
-    open(openfile);
-  else
-    update_title();
-  reset_exec();
+  IdeState *state = *((IdeState**) p);
+  state->run_fwd();
 }
 
-
-IdeState::~IdeState()
+void run_back_cb(Fl_Widget *w, void *p)
 {
-  delete chooser;
+  IdeState *state = *((IdeState**) p);
+  state->run_back();
 }
 
-
-void IdeState::mark_dirty()
+void step_fwd_cb(Fl_Widget *w, void *p)
 {
-  BFInt::mark_dirty();
-  mark_dirty_file(true);
+  IdeState *state = *((IdeState**) p);
+  state->step_fwd();
 }
 
-
-void IdeState::prompt(bool isPrompt)
+void step_back_cb(Fl_Widget *w, void *p)
 {
-  this->isPrompt=isPrompt;
-  if(!isPrompt)
-    unblock();
+  IdeState *state = *((IdeState**) p);
+  state->step_back();
 }
 
-
-void IdeState::new_file()
+void reset_cb(Fl_Widget *w, void *p)
 {
-  if(overwrite())
-    return;
-  reset_exec();
-  editor->buffer()->text(0);
-  BFInt::mark_dirty();
-  openfile = 0;
-  mark_dirty_file(false);
+  IdeState *state = *((IdeState **) p);
+  state->reset_exec();
 }
 
-
-void IdeState::save_as(const char *filename)
+void prompt_cb(Fl_Widget *w, void *p)
 {
-  if(!filename)
+  IdeState *state = *((IdeState**) p);
+  state->prompt(true);
+}
+
+void null_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->prompt(false);
+}
+
+void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
+               const char* deletedText,
+               void* p)
+{
+  IdeState *state = *((IdeState**) p);
+  if(nInserted || nDeleted)
+    state->mark_dirty();
+}
+
+void inp_edited_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->unblock();
+}
+
+void new_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->new_file();
+}
+
+void open_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->open();
+}
+
+void save_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->save();
+}
+
+void save_as_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->save_as();  
+}
+
+void close_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->close();
+}
+
+int main(int argc, char **argv)
+{
+  /* widget hierarchy */
+  Fl_Double_Window *window = new Fl_Double_Window(W_WINDOW,H_WINDOW,"bfide");
+    Fl_Menu_Bar *menu = new Fl_Menu_Bar(0,0,W_WINDOW,H_MENUBAR);
+    Fl_Tile *tile = new Fl_Tile(0,H_MENUBAR,W_WINDOW,H_EDITOR);
+      Fl_Box *boxTileResize = new Fl_Box(MIN_W_EDITOR,H_MENUBAR,W_WINDOW - (MIN_W_EDITOR + MIN_W_DISP), H_EDITOR);
+      Fl_Text_Editor *editor = new Fl_Text_Editor(0,H_MENUBAR,W_EDITOR,H_EDITOR);
+      Fl_Group *groupIo = new Fl_Group(W_EDITOR,H_MENUBAR,W_DISP,H_EDITOR);
+        Fl_Text_Display *dispIo = new Fl_Text_Display(W_EDITOR,H_MENUBAR,W_DISP,H_DISP);
+        Fl_Input *inpIo = new Fl_Input(W_EDITOR,H_MENUBAR+H_DISP,W_DISP,H_INPUT);
+      groupIo->end();
+    tile->end();
+    Fl_Scroll *scrollTape = new Fl_Scroll(0,H_MENUBAR+H_EDITOR,W_WINDOW,H_TAPE);
+      Fl_Pack *packTape = new Fl_Pack(scrollTape->x(),scrollTape->y(),1,H_CELL);
+      packTape->end();
+    scrollTape->end();
+  window->end();
+
+  /* configure widgets and resize behaviour */
+  packTape->type(Fl_Pack::HORIZONTAL);
+  scrollTape->resizable(0);
+  groupIo->resizable(dispIo);
+  tile->resizable(boxTileResize);
+  window->resizable(tile);
+  window->size_range(MIN_W_EDITOR + MIN_W_DISP,H_MENUBAR + MIN_H_TILE + H_TAPE);
+
+  /* setup data structures */
+  Fl_Text_Buffer *buffProg = new Fl_Text_Buffer();
+  editor->buffer(buffProg);
+  editor->textfont(FL_COURIER);
+  Fl_Text_Buffer *buffIo = new Fl_Text_Buffer();
+  dispIo->buffer(buffIo);
+  dispIo->textfont(FL_COURIER);
+
+  /* load commandline scripts or stdin, if any */
+  char *openfile = 0;
+  int i;
+  int arg = Fl::args(argc,argv,i);
+  if(arg && arg < argc)
   {
-    create_chooser("BF source (*.bf)\tC source (*.c)\tAll Files (*)",
-                   Fl_File_Chooser::CREATE,"Save as");
-  }
-  else
-  {
-    if((!openfile || strcmp(openfile,filename)) &&
-        chooser && chooser->filter_value() == 1)
+    if(argv[i][0]=='-')
     {
-      FILE *cFile = fl_fopen(filename,"w");
-      char *buff = editor->buffer()->text();
-      fputs(BFInt::export_c(buff).c_str(),cFile);
-      free(buff);
-      fclose(cFile);
+      char buff[1024];
+      while(fgets(buff,1024,stdin))
+        buffProg->append(buff);
     }
     else
+      openfile = argv[i];
+  }
+  window->show(argc, argv);
+
+  /* set up state object, menu, and callbacks */
+  IdeState *statep = 0;
+  Fl_Menu_Item menuItems[] =
     {
-      editor->buffer()->savefile(filename);
-      openfile = filename;
-      mark_dirty_file(false);
-    }
-  }
-}
+      {"&File",            0,             0,            0,        FL_SUBMENU},
+        {"&New",           (FL_CTRL+'n'), new_cb,       &statep},
+        {"&Open",          (FL_CTRL+'o'), open_cb,      &statep},
+        {"&Save",          (FL_CTRL+'s'), save_cb,      &statep},
+        {"Save &as",       (FL_CTRL+'S'), save_as_cb,   &statep},
+        {"&Close",         (FL_CTRL+'w'), close_cb,     &statep},
+      {0},
+      {"&Run",             0,             0,            0,        FL_SUBMENU},
+        {"Res&tart",       (FL_F+5),      reset_cb,     &statep,  FL_MENU_DIVIDER},
+        {"&Run",           (FL_F+4),      run_fwd_cb,   &statep},
+        {"&Step",          (FL_F+3),      step_fwd_cb,  &statep,  FL_MENU_DIVIDER},
+        {"Step &back",     (FL_F+2),      step_back_cb, &statep},
+        {"Run back",       (FL_F+1),      run_back_cb,  &statep},
+      {0},
+      {"&Options",         0,             0,            0,        FL_SUBMENU},
+        {"Get more input", 0,             0,            0,        FL_SUBMENU},
+          {"&Prompt user", (FL_CTRL+'p'), prompt_cb,    &statep,  FL_MENU_RADIO|FL_MENU_VALUE},
+          {"&Always null", (FL_CTRL+'0'), null_cb,      &statep,  FL_MENU_RADIO},
+        {0},
+      {0},
+    {0}};
+  menu->menu(menuItems);
+  IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,menuItems+3,openfile);
+  statep = &state;
+  buffProg->add_modify_callback(&edited_cb, &statep);
+  inpIo->callback(&inp_edited_cb, &statep);
+  inpIo->when(FL_WHEN_CHANGED);
+  window->callback(close_cb, &statep);
 
-
-void IdeState::save()
-  {save_as(openfile);}
-
-
-void IdeState::open(const char *filename)
-{
-  if(!filename)
-  {
-    if(overwrite())
-      return;
-    create_chooser("BF Source (*.bf)\tAll Files (*)",
-                   Fl_File_Chooser::SINGLE,"Open");
-  }
-  else
-  {
-    editor->buffer()->loadfile(filename);
-    BFInt::mark_dirty();
-    openfile = filename;
-    mark_dirty_file(false);
-  }
-}
-
-void IdeState::close()
-{
-  if(overwrite())
-    return;
-  window->hide();
-}
-
-
-/* Private ********************************************************************/
-
-
-bool IdeState::overwrite()
-{
-  if(!isDirtyFile)
-    return false;
-  switch(fl_choice("You have unsaved changes to %s. Are you sure?",
-                   "Cancel","Continue","Save",openfile ? openfile : "untitled"))
-    {
-      case 0: return true;
-      case 2: save();
-      case 1:
-      default: return false;
-    }
-}
-
-
-void IdeState::update_title()
-{
-  char buff[FL_PATH_MAX + 20];
-  strcpy(buff,"bfide - ");
-  if(isDirtyFile)
-    strcat(buff,"*");
-  if(openfile)
-    strncat(buff,fl_filename_name(openfile),FL_PATH_MAX);
-  else
-    strcat(buff,"untitled");
-  window->copy_label(buff);
-}
-
-
-void IdeState::mark_dirty_file(bool isDirty)
-{
-  isDirtyFile = isDirty;
-  if(!openfile || isDirtyFile)
-    menuSave->activate();
-  else
-    menuSave->deactivate();
-  update_title();
-}
-
-
-void IdeState::create_chooser(const char *filter, int type, const char *label)
-{
-  if(!chooser)
-  {
-    chooser = new Fl_File_Chooser(openfile,filter,type,label);
-    chooser->callback(&chooser_cb, this);
-  }
-  else
-  {
-    chooser->type(type);
-    chooser->label(label);
-    chooser->filter(filter);
-    chooser->value(openfile);
-  }
-  chooser->show();
-}
-
-
-void IdeState::highlight_cell(unsigned cell)
-{
-  if(cell >= packTape->children())
-    return;
-  Fl_Group *cellGroup = packTape->child(cell)->as_group();
-  Fl_Widget *cellMemb = cellGroup->child(2);
-  cellMemb->box(FL_UP_BOX);
-}
-
-
-void IdeState::unhighlight_cell(unsigned cell)
-{
-  if(cell >= packTape->children())
-    return;
-  Fl_Group *cellGroup = packTape->child(cell)->as_group();
-  Fl_Widget *cellMemb = cellGroup->child(2);
-  cellMemb->box(FL_NO_BOX);
-}
-
-
-unsigned char IdeState::input()
-{
-  if(!isInput)
-  {
-    /* make buffer ready to have input written to it */
-    char buff[3] = "\n>";
-    dispIo->buffer()->append(buff);
-    isInput=true;
-  }
-  int size;
-  if(!(size=inpIo->size()))
-    /* input never gets called if set to prompt with no input ready.
-    *  so if execution gets here, and none is ready, send null. */
-    return 0;
-  char buff[2];
-  buff[0] = inpIo->value()[0];
-  /* consume character */
-  inpIo->replace(0,1,0);
-  inpIo->position(size-1);
-  buff[1]='\0';
-  dispIo->buffer()->append(buff);
-  return buff[0];  
-}
-
-void IdeState::backinput()
-{
-  int toDelete = isInput ? 1 : 2;
-  isInput=true;
-  int end = dispIo->buffer()->length();
-  char cell = get_cell(get_tape_pos());
-  if(cell)
-  {
-    inpIo->position(0);
-    inpIo->insert(&cell, 1);
-    inpIo->position(inpIo->size());
-    dispIo->buffer()->remove(end - toDelete, end);
-  }
-  else
-    dispIo->buffer()->remove(end - toDelete - 1, end);
-
-}
-
-bool IdeState::input_ready()
-{
-  if(!isPrompt)
-    return true;
-  return (inpIo->size() > 0);
-}
-
-void IdeState::output(unsigned char out)
-{
-  char buff[3];
-  buff[2]='\0';
-  buff[1]=out;
-  buff[0]='\n';
-  /* put output on separate line from input */
-  dispIo->buffer()->append(isInput ? buff : buff+1);
-  isInput=false;
-}
-
-void IdeState::backoutput()
-{
-  int toDelete = isInput ? 3 : 1;
-  isInput=false;
-  int end = dispIo->buffer()->length();
-  dispIo->buffer()->remove(end - toDelete, end);
-}
-
-void IdeState::err_output(std::string message, bool is_warning)
-{
-//make popup later?
-  if(!is_warning)
-    dispIo->buffer()->append(("\nERROR: "+message).c_str());
-}
-
-std::string IdeState::new_program()
-  {return std::string(editor->buffer()->text());}
-
-
-void IdeState::d_block()
-  {inpIo->take_focus();}
-
-
-int IdeState::d_handle()
-{
-  /* handle breakpoints */
-  return get_cmd(get_prog_pos()) == '$' ? 3 : 0;
-}
-
-
-bool IdeState::d_backhandle()
-{
-  /* handle reverse breakpoints */
-  return get_cmd(get_prog_pos()) == '$' ? false : true;
-}
-
-
-void IdeState::d_add_cell()
-{
-  /* add widget */
-  const int h_cell_field = config.h_cell_field;
-  const int h_cell = 3 * h_cell_field;
-  const int w_cell = config.w_cell;
-  Fl_Group *newCell = new Fl_Group(0,0,w_cell,h_cell);
-    Fl_Output *newCellChar = new Fl_Output(0,0,w_cell,h_cell_field);
-    Fl_Output *newCellVal = new Fl_Output(0,h_cell_field,w_cell,h_cell_field);
-    Fl_Box *newCellIndex = new Fl_Box(0,2*h_cell_field,w_cell,h_cell_field);
-  newCell->end();
-  packTape->add(newCell);
-  char buff[20] = "";
-  snprintf(buff,20,"%i",get_tape_pos());
-  newCellIndex->copy_label(buff);
-  /* write 0 */
-  d_write_cell(0);
-}
-
-
-void IdeState::d_write_cell(unsigned char val)
-{
-  Fl_Group *cell=packTape->child(get_tape_pos())->as_group();
-  Fl_Output *cellMemb = (Fl_Output*) cell->child(0);
-  char buff[3] = "";
-  /* ascii */
-  snprintf(buff,3,"%c",val);
-  cellMemb->value(buff);
-  cellMemb = (Fl_Output*) cell->child(1);
-  /* hex */
-  snprintf(buff,3,"%2X",val);
-  cellMemb->value(buff);
-  scrollTape->redraw();
-}
-
-
-void IdeState::d_write_tape_pos(unsigned oldPos)
-{
-  unhighlight_cell(oldPos);
-  highlight_cell(get_tape_pos());
-  scrollTape->redraw();
-}
-
-
-void IdeState::d_write_prog_pos(unsigned oldPos)
-  {editor->buffer()->highlight(get_prog_pos(),get_prog_pos()+1);}
-
-
-void IdeState::d_reset_exec()
-{
-  /* clears dispIo: for history, change to insert some newlines */
-  dispIo->buffer()->text(0);
-  inpIo->value(0);
-  isInput=false;
-  packTape->clear();
-  d_add_cell();
-  highlight_cell(0);
-}
-
-
-void IdeState::chooser_cb(Fl_File_Chooser *w, void *p)
-{
-  IdeState *state = (IdeState*) p;
-  if(!w->shown())
-  {
-    switch(w->type())
-    {
-      case Fl_File_Chooser::SINGLE : state->open(w->value());break;
-      case Fl_File_Chooser::CREATE : state->save_as(w->value());break;
-    }
-  }
+  return Fl::run();
 }

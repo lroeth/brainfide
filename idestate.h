@@ -1,5 +1,5 @@
-#ifndef BFIDE_H
-#define BFIDE_H
+#ifndef IDESTATE_H
+#define IDESTATE_H
 
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
@@ -90,4 +90,4 @@ class IdeState : public BFIntBidir
     const char *openfile; /* current file, or null for untitled */
 };
 
-#endif //BFIDE_H
+#endif //IDESTATE_H

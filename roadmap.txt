@@ -1,2 +1,1 @@
-- move some bfide functionality to bfint
 - syntax highlighting

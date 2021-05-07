@@ -1,3 +1,6 @@
+#ifndef CLINT_H
+#define CLINT_H
+
 #include "bfint.h"
 
 class CLInt : public BFInt
@@ -12,3 +15,5 @@ class CLInt : public BFInt
     int d_handle();
     std::string *program;
 };
+
+#endif //CLINT_H

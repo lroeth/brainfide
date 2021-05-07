@@ -1,3 +1,6 @@
+#ifndef BFINTBIDIR_H
+#define BFINTBIDIR_H
+
 #include "bfint.h"
 #include <stack>
 
@@ -43,3 +46,5 @@ class BFIntBidir : public BFInt
     */
     std::map<unsigned,std::stack<unsigned> > loopReps;
 };
+
+#endif //BFINTBIDIR_H

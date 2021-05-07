@@ -1,3 +1,6 @@
+#ifndef BFIDE_H
+#define BFIDE_H
+
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Buffer.H>
@@ -86,3 +89,5 @@ class IdeState : public BFIntBidir
     bool isPrompt; /* if input runs out, prompt user. if false, just feed nulls */
     const char *openfile; /* current file, or null for untitled */
 };
+
+#endif //BFIDE_H

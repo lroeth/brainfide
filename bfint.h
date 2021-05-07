@@ -1,3 +1,6 @@
+#ifndef BFINT_H
+#define BFINT_H
+
 #include <string>
 #include <vector>
 #include <map>
@@ -65,3 +68,5 @@ class BFInt
     bool isRun;
     bool isBlocking;
 };
+
+#endif //BFINT_H

@@ -96,22 +96,34 @@ void inp_edited_cb(Fl_Widget *w, void *p)
   state->unblock();
 }
 
-void save_as_cb(Fl_Widget *w, void *p)
+void new_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = *((IdeState**) p);
-  state->export_file();
+  state->new_file();
 }
 
 void open_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = *((IdeState**) p);
-  state->import_file();
+  state->open();
 }
 
 void save_cb(Fl_Widget *w, void *p)
 {
   IdeState *state = *((IdeState**) p);
-  state->export_curr();
+  state->save();
+}
+
+void save_as_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->save_as();  
+}
+
+void window_cb(Fl_Widget *w, void *p)
+{
+  IdeState *state = *((IdeState**) p);
+  state->close();
 }
 
 int main(int argc, char **argv)
@@ -171,6 +183,7 @@ int main(int argc, char **argv)
   Fl_Menu_Item menuItems[] =
     {
       {"&File",            0,             0,            0,        FL_SUBMENU},
+        {"&New",           (FL_CTRL+'n'), new_cb,       &statep},
         {"&Open",          (FL_CTRL+'o'), open_cb,      &statep},
         {"&Save",          (FL_CTRL+'s'), save_cb,      &statep},
         {"Save &as",       (FL_CTRL+'S'), save_as_cb,   &statep},
@@ -185,16 +198,17 @@ int main(int argc, char **argv)
       {"&Options",         0,             0,            0,        FL_SUBMENU},
         {"Get more input", 0,             0,            0,        FL_SUBMENU},
           {"&Prompt user", (FL_CTRL+'p'), prompt_cb,    &statep,  FL_MENU_RADIO|FL_MENU_VALUE},
-          {"&Always null", (FL_CTRL+'n'), null_cb,      &statep,  FL_MENU_RADIO},
+          {"&Always null", (FL_CTRL+'0'), null_cb,      &statep,  FL_MENU_RADIO},
         {0},
       {0},
     {0}};
   menu->menu(menuItems);
-  IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,menuItems+2,openfile);
+  IdeState state(H_CELL_FIELD,W_CELL,window,editor,dispIo,inpIo,scrollTape,packTape,menuItems+3,openfile);
   statep = &state;
   buffProg->add_modify_callback(&edited_cb, &statep);
   inpIo->callback(&inp_edited_cb, &statep);
   inpIo->when(FL_WHEN_CHANGED);
+  window->callback(window_cb, &statep);
 
   return Fl::run();
 }

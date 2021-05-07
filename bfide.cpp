@@ -5,6 +5,7 @@
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Box.H>
 #include <FL/filename.H>
+#include <FL/fl_ask.H>
 #include <FL/Fl_Menu_Item.H>
 #include "bfide.h"
 
@@ -25,15 +26,16 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   chooser(0),
   menuSave(menuSave),
   config(h_cell_field,w_cell),
-  isDirtyFile(true),
+  isDirtyFile(false),
   isInput(false),
   isPrompt(true),
   openfile(openfile)
 {
   if(openfile)
-    import_file(openfile);
+    open(openfile);
   else
     update_title();
+  menuSave->deactivate();
   reset_exec();
 }
 
@@ -47,9 +49,7 @@ IdeState::~IdeState()
 void IdeState::mark_dirty()
 {
   BFInt::mark_dirty();
-  isDirtyFile=true;
-  update_title();
-  menuSave->activate();
+  mark_dirty_file(true);
 }
 
 
@@ -61,27 +61,29 @@ void IdeState::prompt(bool isPrompt)
 }
 
 
-void IdeState::export_file(const char *filename)
+void IdeState::new_file()
+{
+  if(overwrite())
+    return;
+  reset_exec();
+  editor->buffer()->text(0);
+  BFInt::mark_dirty();
+  openfile = 0;
+  mark_dirty_file(false);
+}
+
+
+void IdeState::save_as(const char *filename)
 {
   if(!filename)
   {
-    if(!chooser)
-    {
-      chooser = new Fl_File_Chooser(0,"BF source (*.bf)\tC source (*.c)\tAll Files (*)",Fl_File_Chooser::CREATE,"Save as");
-      chooser->callback(&chooser_cb, this);
-    }
-    else
-    {
-      chooser->type(Fl_File_Chooser::CREATE);
-      chooser->label("Save as");
-      chooser->value(openfile);
-      chooser->filter("BF source (*.bf)\tC source (*.c)\tAll Files (*)");
-    }
-    chooser->show();
+    create_chooser("BF source (*.bf)\tC source (*.c)\tAll Files (*)",
+                   Fl_File_Chooser::CREATE,"Save as");
   }
   else
   {
-    if(strcmp(openfile,filename) && chooser && chooser->filter_value() == 1)
+    if((!openfile || strcmp(openfile,filename)) &&
+        chooser && chooser->filter_value() == 1)
     {
       FILE *cFile = fl_fopen(filename,"w");
       char *buff = editor->buffer()->text();
@@ -93,52 +95,100 @@ void IdeState::export_file(const char *filename)
     {
       editor->buffer()->savefile(filename);
       openfile = filename;
-      isDirtyFile = false;
-      menuSave->deactivate();
-      update_title();
+      mark_dirty_file(false);
     }
   }
 }
 
 
-void IdeState::export_curr()
-  {export_file(openfile);}
+void IdeState::save()
+  {save_as(openfile);}
 
 
-void IdeState::import_file(const char *filename)
+void IdeState::open(const char *filename)
 {
   if(!filename)
   {
-    if(!chooser)
-    {
-      chooser = new Fl_File_Chooser(openfile,"BF Source (*.bf)\tAll Files (*)",Fl_File_Chooser::SINGLE,"Open");
-      chooser->callback(&chooser_cb, this);
-    }
-    else
-    {
-      chooser->type(Fl_File_Chooser::SINGLE);
-      chooser->label("Open");
-      chooser->value(openfile);
-      chooser->filter("BF Source (*.bf)\tAll Files (*)");
-    }
-    chooser->show();
+    if(overwrite())
+      return;
+    create_chooser("BF Source (*.bf)\tAll Files (*)",
+                   Fl_File_Chooser::SINGLE,"Open");
   }
   else
   {
     editor->buffer()->loadfile(filename);
     BFInt::mark_dirty();
-    isDirtyFile = false;
-    menuSave->deactivate();
     openfile = filename;
-    update_title();
+    mark_dirty_file(false);
   }
+}
+
+void IdeState::close()
+{
+  if(overwrite())
+    return;
+  window->hide();
 }
 
 
 /* Private ********************************************************************/
 
 
+bool IdeState::overwrite()
+{
+  if(!isDirtyFile)
+    return false;
+  switch(fl_choice("You have unsaved changes to %s. Are you sure?",
+                   "Cancel","Continue","Save",openfile ? openfile : "untitled"))
+    {
+      case 2: save();
+      case 1: return false;
+      case 0: return true;
+    }
+}
 
+
+void IdeState::update_title()
+{
+  char buff[FL_PATH_MAX + 20];
+  strcpy(buff,"bfide - ");
+  if(isDirtyFile)
+    strcat(buff,"*");
+  if(openfile)
+    strncat(buff,fl_filename_name(openfile),FL_PATH_MAX);
+  else
+    strcat(buff,"untitled");
+  window->copy_label(buff);
+}
+
+
+void IdeState::mark_dirty_file(bool isDirty)
+{
+  isDirtyFile = isDirty;
+  if(isDirtyFile)
+    menuSave->activate();
+  else
+    menuSave->deactivate();
+  update_title();
+}
+
+
+void IdeState::create_chooser(const char *filter, int type, const char *label)
+{
+  if(!chooser)
+  {
+    chooser = new Fl_File_Chooser(openfile,filter,type,label);
+    chooser->callback(&chooser_cb, this);
+  }
+  else
+  {
+    chooser->type(type);
+    chooser->label(label);
+    chooser->filter(filter);
+    chooser->value(openfile);
+  }
+  chooser->show();
+}
 
 
 void IdeState::highlight_cell(unsigned cell)
@@ -158,20 +208,6 @@ void IdeState::unhighlight_cell(unsigned cell)
   Fl_Group *cellGroup = packTape->child(cell)->as_group();
   Fl_Widget *cellMemb = cellGroup->child(2);
   cellMemb->box(FL_NO_BOX);
-}
-
-
-void IdeState::update_title()
-{
-  char buff[FL_PATH_MAX + 20];
-  strcpy(buff,"bfide - ");
-  if(isDirtyFile)
-    strcat(buff,"*");
-  if(openfile)
-    strncat(buff,fl_filename_name(openfile),FL_PATH_MAX);
-  else
-    strcat(buff,"untitled");
-  window->copy_label(buff);
 }
 
 
@@ -339,8 +375,8 @@ void IdeState::chooser_cb(Fl_File_Chooser *w, void *p)
   {
     switch(w->type())
     {
-      case Fl_File_Chooser::SINGLE : state->import_file(w->value());break;
-      case Fl_File_Chooser::CREATE : state->export_file(w->value());break;
+      case Fl_File_Chooser::SINGLE : state->open(w->value());break;
+      case Fl_File_Chooser::CREATE : state->save_as(w->value());break;
     }
   }
 }

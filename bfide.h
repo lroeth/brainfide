@@ -26,18 +26,22 @@ class IdeState : public BFIntBidir
     *    false | send null character ('\0')
     */
     void prompt(bool isPrompt);
-    /* Export / import script to/from file
+    /* save/load script to/from file
     *  If filename is null, run file picker to get file
-    *  Export_curr overwrites currently open filename automatically,
+    *  save() overwrites currently open filename automatically,
     *    or calls file picker if no currently open file.
     */
-    void export_file(const char *filename=0);
-    void export_curr();
-    void import_file(const char *filename=0);
+    void new_file();
+    void save_as(const char *filename=0);
+    void save();
+    void open(const char *filename=0);
+    void close();
 
   private:
-    /* handle window title */
-    void update_title();
+    bool overwrite(); /* confirm before losing unsaved changes, if necessary */
+    void update_title(); /* handle window title */
+    void mark_dirty_file(bool isDirty);
+    void create_chooser(const char *filter, int type, const char *label); /* make sure chooser exists and has the arg attributes, then show it */
 
     /* handle tape pointer, for d_write_tape_pos */
     void highlight_cell(unsigned cell);

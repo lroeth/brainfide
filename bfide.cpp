@@ -120,7 +120,7 @@ int main(int argc, char **argv)
   Fl_Menu_Item menuItems[] =
     {
       {"&File",            0,             0,             0,        FL_SUBMENU},
-        {"&New",           (FL_CTRL+'n'), new_file_cb,        &statep},
+        {"&New",           (FL_CTRL+'n'), new_file_cb,   &statep},
         {"&Open",          (FL_CTRL+'o'), open_cb,       &statep},
         {"&Save",          (FL_CTRL+'s'), save_cb,       &statep},
         {"Save &as",       (FL_CTRL+'S'), save_as_cb,    &statep},

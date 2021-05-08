@@ -34,7 +34,7 @@ IdeState::IdeState(int h_cell_field, int w_cell, Fl_Window *window, Fl_Text_Edit
   if(openfile)
     open(openfile);
   else
-    update_title();
+    mark_dirty_file(false);
   reset_exec();
 }
 
@@ -240,8 +240,9 @@ unsigned char IdeState::input()
 
 void IdeState::backinput()
 {
-  int toDelete = isInput ? 1 : 2;
-  isInput=true;
+  bool isInputBegin = get_prog_pos() == 0;
+  int toDelete = !isInputBegin ? isInput ? 1 : 2 : 4;
+  isInput = !isInputBegin;
   int end = dispIo->buffer()->length();
   char cell = get_cell(get_tape_pos());
   if(cell)
@@ -363,7 +364,6 @@ void IdeState::d_reset_exec()
 {
   /* clears dispIo: for history, change to insert some newlines */
   dispIo->buffer()->text(0);
-  inpIo->value(0);
   isInput=false;
   packTape->clear();
   d_add_cell();

@@ -1,4 +1,5 @@
 bfide
 clint
+sbfide
+sclint
 *.o
-flags.mk

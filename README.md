@@ -44,10 +44,12 @@ The window title shows the name of the current file as well as an asterisk if it
 ##### Menu
 
 * File
+    * New: creates a new empty file. Asks for confirmation before discarding unsaved changes.
     * Save: saves to the current file. The save button is greyed out when the disk file is up to date.
     * Save As: save to a file and set it as the current file.
         * If the chosen file is C source rather than BF, it is exported to, but the current file remains unchanged.
-    * Open: loads a file and sets it as the current file.
+    * Open: loads a file and sets it as the current file. Asks for confirmation before discarding unsaved changes.
+    * Close: close currently open file. Asks for confirmation before discarding unsaved changes.
 * Run
     * Reset: Reset to beginning of program, clearing tape and I/O.
     * Run: Begin/continue running until EOF or a breakpoint.

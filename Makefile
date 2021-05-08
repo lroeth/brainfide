@@ -3,7 +3,7 @@ FLTKCONFIG = fltk-config
 cxx = $(shell $(FLTKCONFIG) --cxx )
 fltk_comp_flags = $(shell $(FLTKCONFIG) --cxxflags )
 fltk_link_flags = $(shell $(FLTKCONFIG) --ldflags )
-fltk_static_link_flags = $(shell $(FLTKCONFIG) --ldstaticflags )
+fltk_static_link_flags = -static $(shell $(FLTKCONFIG) --ldstaticflags )
 
 all : bfide clint
 

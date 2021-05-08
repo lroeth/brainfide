@@ -40,15 +40,17 @@
 #define MIN_H_TILE (MIN_H_EDITOR < MIN_H_DISP + H_INPUT ? MIN_H_DISP + H_INPUT : MIN_H_EDITOR)
 
 
-/* define callback functions */
-#define MAKE_CB(func) void func ## _cb(Fl_Widget *w, void *p) {IdeState *state = *((IdeState**) p); state->func();}
+/* Each CB(func) invocation defines callback function func_cb, which takes
+*    IdeState **p and runs member function func with no arguments
+*/
+#define CB(func) void func ## _cb(Fl_Widget *w, void *p) {IdeState *state = *((IdeState**) p); state->func();}
 
 /* run */
-MAKE_CB(run_fwd) MAKE_CB(run_back) MAKE_CB(step_fwd) MAKE_CB(step_back) MAKE_CB(reset_exec)
+CB(run_fwd) CB(run_back) CB(step_fwd) CB(step_back) CB(reset_exec)
 /* file */
-MAKE_CB(new_file) MAKE_CB(open) MAKE_CB(save) MAKE_CB(save_as) MAKE_CB(close)
+CB(new_file) CB(open) CB(save) CB(save_as) CB(close)
 /* input */
-MAKE_CB(unblock) MAKE_CB(prompt) MAKE_CB(null)
+CB(unblock) CB(prompt) CB(null)
 
 void edited_cb(int pos, int nInserted, int nDeleted, int nRestyled,
                const char* deletedText,

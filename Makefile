@@ -13,7 +13,7 @@ run : bfide
 	./bfide
 
 clean :
-	-rm bfide clint *.o
+	-rm bfide clint sbfide sclint *.o
 
 bfide : bfide.o idestate.o bfintbidir.o bfint.o
 	$(cxx)  -o $@ $^ $(fltk_link_flags)

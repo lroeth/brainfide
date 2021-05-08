@@ -25,10 +25,12 @@ class IdeState : public BFIntBidir
     ~IdeState();
     void mark_dirty();
     /* Set behavior on running out of input:
-    *    true  | prompt user for more input
-    *    false | send null character ('\0')
+    *    prompt | prompt user for more input
+    *    null   | send null character ('\0')
+    *  Last called is the current setting, defaults to prompt
     */
-    void prompt(bool isPrompt);
+    void prompt();
+    void null();
     /* save/load script to/from file
     *  If filename is null, run file picker to get file
     *  save() overwrites currently open filename automatically,

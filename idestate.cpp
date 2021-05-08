@@ -52,11 +52,14 @@ void IdeState::mark_dirty()
 }
 
 
-void IdeState::prompt(bool isPrompt)
+void IdeState::prompt()
+  {isPrompt = true;}
+
+
+void IdeState::null()
 {
-  this->isPrompt=isPrompt;
-  if(!isPrompt)
-    unblock();
+  isPrompt = false;
+  unblock();
 }
 
 

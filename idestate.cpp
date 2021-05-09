@@ -287,7 +287,7 @@ void IdeState::err_output(std::string message, bool is_warning)
 {
 //make popup later?
   if(!is_warning)
-    dispIo->buffer()->append(("\nERROR: "+message).c_str());
+    fl_message(("\nERROR: "+message).c_str());
 }
 
 std::string IdeState::new_program()

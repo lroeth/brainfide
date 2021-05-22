@@ -30,6 +30,7 @@ class BFInt
     void write_tape_pos(unsigned newPos);
     void write_prog_pos(unsigned newPos);
 
+  /* privte (except for BFIntBiDir) */
     /* virtuals for implementations */
     virtual unsigned char input()=0;
     virtual bool input_ready() {return true;}

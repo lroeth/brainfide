@@ -95,6 +95,9 @@ Installation
 
 ### MinGW-w64
 
+CURRENTLY BROKEN: issue relating to pathname resolution of libfltk.a from binary fltk.
+Works using fltk-config when fltk is built from source.
+
 1. Install [fltk 1.3](https://www.fltk.org/software.php) and make.
 
         pacman -S mingw-w64-x86_64-fltk mingw-w64-x86_64-make
